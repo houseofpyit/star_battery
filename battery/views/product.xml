@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="inherit_barcode_product_mst_smart_button_view" model="ir.ui.view">
+        <field name="name">hop.product.mst.button.form.inherit.barcode</field>
+        <field name="model">hop.product.mst</field>
+        <field name="inherit_id" ref="master.product_mst_form" />
+        <field name="arch" type="xml">
+              <xpath expr="//field[@name='barcode']" position="after">
+              <field name="warranty" />
+              <field name="distributor_warranty" />
+              </xpath>
+        </field>
+    </record>
+
+</odoo>

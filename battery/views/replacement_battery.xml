@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <!-- Action -->
+    <record id="action_hop_replacement_battery" model="ir.actions.act_window">
+        <field name="name">Battery Replacements Tracking</field>
+        <field name="res_model">hop.replacement.battery</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <!-- Tree View -->
+    <record id="view_hop_replacement_battery_tree" model="ir.ui.view">
+        <field name="name">hop.replacement.battery.tree</field>
+        <field name="model">hop.replacement.battery</field>
+        <field name="arch" type="xml">
+            <tree create="0">
+                <field name="date"/>
+                <field name="party_id" force_save="1" options="{'no_create_edit': True,'no_create': True, 'no_quick_create': True}"/>
+                <field name="salebill_id" force_save="1" options="{'no_create_edit': True,'no_create': True, 'no_quick_create': True}" />
+                <field name="barcode_id" force_save="1" options="{'no_create_edit': True,'no_create': True, 'no_quick_create': True}"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Form View -->
+    <record id="view_hop_replacement_battery_form" model="ir.ui.view">
+        <field name="name">hop.replacement.battery.form</field>
+        <field name="model">hop.replacement.battery</field>
+        <field name="arch" type="xml">
+            <form string="Battery Replacement" create="0">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="barcode_id" force_save="1"  options="{'no_create_edit': True,'no_create': True, 'no_quick_create': True}" readonly="1"/>
+                            <field name="party_id" force_save="1"  options="{'no_create_edit': True,'no_create': True, 'no_quick_create': True}" readonly="1"/>
+                        </group>
+                        <group>
+                             <field name="date"  force_save="1" readonly="1"/>
+                             <field name="product_id" force_save="1" readonly="1" invisible="1" />
+                             <field name="warranty_end_date"  force_save="1" readonly="1"/>
+                            <field name="salebill_id" force_save="1"  options="{'no_create_edit': True,'no_create': True, 'no_quick_create': True}" readonly="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Replacement Details">
+                            <field name="line_ids">
+                                <tree editable="bottom" delete="0" >
+                                    <field name="date"  force_save="1" readonly="1"/>
+                                    <field name="barcode_id"  force_save="1" readonly="1"/>
+                                    <field name="salebill_id"  force_save="1" readonly="1"/>
+                                    <field name="product_id" force_save="1" readonly="1" invisible="1" />
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Search View -->
+    <record id="view_hop_replacement_battery_search" model="ir.ui.view">
+        <field name="name">hop.replacement.battery.search</field>
+        <field name="model">hop.replacement.battery</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="party_id" readonly="1"/>
+                <field name="date" readonly="1"/>
+                <field name="salebill_id" readonly="1"/>
+                <field name="barcode_id" readonly="1"/>
+                <field name="warranty_end_date" readonly="1"/>
+            </search>
+        </field>
+    </record>
+
+    <!-- Tree View for Replacement Line -->
+    <record id="view_hop_replacement_battery_line_tree" model="ir.ui.view">
+        <field name="name">hop.replacement.battery.line.tree</field>
+        <field name="model">hop.replacement.battery.line</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="date"/>
+                <field name="barcode_id"/>
+            </tree>
+        </field>
+    </record>
+
+        <!-- Menu Item -->
+    <menuitem id="menu_hop_replacement_battery_root" name="Battery Replacement" sequence="10" web_icon="battery,static/description/img/battery.png" />
+
+    <menuitem id="menu_hop_replacement_battery"
+              name="Tracking"
+              parent="menu_hop_replacement_battery_root"
+              action="action_hop_replacement_battery"
+              sequence="2" />
+
+</odoo>

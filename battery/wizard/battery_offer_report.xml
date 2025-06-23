@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+
+    <!-- Wizard Form View -->
+    <record id="view_hop_battery_offer_report_wizard_form" model="ir.ui.view">
+        <field name="name">hop.battery.offer.report.wizard.form</field>
+        <field name="model">hop.battery.offer.report.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Battery Offer Report">
+                <sheet>
+                    <group>
+                        <field name="offer_ids" widget="many2many_tags"/>
+                        <field name="party_ids" widget="many2many_tags"/>
+                    </group>
+                    <footer>
+                        <button name="action_report_button" string="Generate Report"
+                                type="object" class="btn-primary"/>
+                        <button string="Cancel" class="btn-secondary" special="cancel"/>
+                    </footer>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <!-- Wizard Action -->
+    <record id="action_hop_battery_offer_report_wizard" model="ir.actions.act_window">
+        <field name="name">Battery Offer Report</field>
+        <field name="res_model">hop.battery.offer.report.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_hop_battery_offer_report_wizard_form"/>
+        <field name="target">new</field>
+    </record>
+
+
+    <menuitem id="menu_hop_battery_offer_report" name="Generate Offer Report"
+              parent="battery.menu_hop_battery_offer_root"
+              action="action_hop_battery_offer_report_wizard"/>
+</odoo>

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <data>
+    
+        <record id="hop_sale_bill_barcode_form_inherited" model="ir.ui.view">
+            <field name="name">Sale bill Inharit</field>
+            <field name="model">hop.salebill</field>
+            <field name="inherit_id" ref="transaction.salebill_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//tree/field[@name='product_id']" position="after">
+                    <field name="barcode_id" domain="[('product_id', '=', product_id)]" />
+                    <field name="total_sale" />
+                </xpath>
+
+                  <xpath expr="//tree/field[@name='final_amt']" position="after">
+                    <field name="offer_status" decoration-success="offer_status != ''"  />
+                </xpath>
+            </field>
+        </record>
+    </data>
+
+</odoo>

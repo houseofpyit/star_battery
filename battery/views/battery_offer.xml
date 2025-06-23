@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!-- Action for Battery Offer -->
+    <record id="action_hop_battery_offer" model="ir.actions.act_window">
+        <field name="name">Battery Offers</field>
+        <field name="res_model">hop.battery.offer</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p> Manage battery offers here. Click on <em>Create</em> to add a new offer. </p>
+        </field>
+    </record>
+
+    <!-- Menu Item -->
+    <menuitem id="menu_hop_battery_offer_root" name="Battery Offers and Report"
+        web_icon="battery,static/description/img/offer.png"
+        sequence="10" />
+
+    <menuitem id="menu_hop_battery_offer" name="Manage Offers"
+        parent="menu_hop_battery_offer_root"
+        action="action_hop_battery_offer" />
+
+    <!-- Tree View -->
+    <record id="view_hop_battery_offer_tree" model="ir.ui.view">
+        <field name="name">hop.battery.offer.tree</field>
+        <field name="model">hop.battery.offer</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name" />
+                <field name="from_date" />
+                <field name="to_date" />
+                <field name="company_ids" invisible="1" />
+            </tree>
+        </field>
+    </record>
+
+    <!-- Form View -->
+    <record id="view_hop_battery_offer_form" model="ir.ui.view">
+        <field name="name">hop.battery.offer.form</field>
+        <field name="model">hop.battery.offer</field>
+        <field name="arch" type="xml">
+            <form string="Battery Offer">
+                <sheet>
+                    <group>
+                        <field name="name" />
+                    </group>
+                    <group>
+                        <group>
+                            <field name="from_date" />
+                        </group>
+                        <group>
+                            <field name="to_date" />
+                            <field name="company_ids" widget="many2many_tags" invisible="1" />
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Products">
+                            <field name="line_ids">
+                                <tree editable="bottom">
+                                    <field name="product_id" />
+                                    <field name="qty" />
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Search View with Filters -->
+    <record id="view_hop_battery_offer_search" model="ir.ui.view">
+        <field name="name">hop.battery.offer.search</field>
+        <field name="model">hop.battery.offer</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name" />
+                <field name="from_date" />
+                <field name="to_date" />
+                <field name="company_ids" />
+
+                <!-- Filters -->
+                <filter string="Active Offers" name="active_offers"
+                    domain="[('from_date', '&lt;=', context_today()), ('to_date', '&gt;=', context_today())]" />
+                <filter string="Upcoming Offers" name="upcoming_offers"
+                    domain="[('from_date', '&gt;', context_today())]" />
+                <filter string="Expired Offers" name="expired_offers"
+                    domain="[('to_date', '&lt;', context_today())]" />
+
+                <!-- Group By Options -->
+                <group string="Group By">
+                    <filter name="group_company" string="Company"
+                        context="{'group_by': 'company_ids'}" />
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Tree View for Offer Lines -->
+    <record id="view_hop_battery_offer_line_tree" model="ir.ui.view">
+        <field name="name">hop.battery.offer.line.tree</field>
+        <field name="model">hop.battery.offer.line</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="mst_id" />
+                <field name="product_id" />
+                <field name="qty" />
+            </tree>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,50 @@
+<odoo>
+    <record id="view_purchasebill_line_barcode_tree" model="ir.ui.view">
+        <field name="name">purchase.bill.line.barcode.tree</field>
+        <field name="model">hop.purchasebill.line.barcode</field>
+        <field name="arch" type="xml">
+            <tree string="Barcodes" create="0" edit="0">
+                <field name="name" force_save="1" readonly="1"/>
+                <field name="stage" force_save="1" readonly="1"/>
+                <field name="product_id" force_save="1" readonly="1"/>
+                <field name="origin" force_save="1" readonly="1"/>
+                <field name="purchase_name" force_save="1" readonly="1"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Search View with Filters and Group By -->
+    <record id="view_purchasebill_line_barcode_search" model="ir.ui.view">
+        <field name="name">purchase.bill.line.barcode.search</field>
+        <field name="model">hop.purchasebill.line.barcode</field>
+        <field name="arch" type="xml">
+            <search string="Search Barcodes">
+                <field name="name"/>
+                <field name="stage"/>
+                <field name="product_id"/>
+                <filter name="filter_stage" string="Stage" domain="[('stage', '!=', False)]"/>
+                <filter name="filter_product" string="Has Product" domain="[('product_id', '!=', False)]"/>
+
+                <!-- Group By Options -->
+                <group expand="0">
+                    <filter name="group_by_stage" string="Group by Stage" context="{'group_by': 'stage'}"/>
+                    <filter name="group_by_product" string="Group by Product" context="{'group_by': 'product_id'}"/>
+                    <filter name="group_by_origin" string="Group by Origin" context="{'group_by': 'origin'}"/>
+                    <filter name="group_by_purchase_name" string="Group by Purchase" context="{'group_by': 'purchase_name'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_purchasebill_line_barcode" model="ir.actions.act_window">
+        <field name="name">Barcodes</field>
+        <field name="res_model">hop.purchasebill.line.barcode</field>
+        <field name="view_mode">tree,search</field>
+        <field name="search_view_id" ref="view_purchasebill_line_barcode_search"/>
+    </record>
+
+    <menuitem id="menu_purchasebill_line_barcode_root"
+              name="Barcodes"
+              parent="master.mst_tbl_menu" 
+              action="action_purchasebill_line_barcode"/>
+</odoo>

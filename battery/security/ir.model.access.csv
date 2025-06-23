@@ -1,0 +1,10 @@
+id,name,model_id/id,group_id/id,perm_read,perm_write,perm_create,perm_unlink
+access_hop_purchasebill_line_barcode,hop_purchasebill_line_barcode,model_hop_purchasebill_line_barcode,,1,1,1,1
+access_hop_replacement_battery,hop_replacement_battery,model_hop_replacement_battery,,1,1,1,1
+access_hop_replacement_battery_line,hop_replacement_battery_line,model_hop_replacement_battery_line,,1,1,1,1
+access_hop_replacement_battery_wizard,hop_replacement_battery_wizard,model_hop_replacement_battery_wizard,,1,1,1,1
+access_hop_replacement_battery_wizard_line,hop_replacement_battery_wizard_line,model_hop_replacement_battery_wizard_line,,1,1,1,1
+access_hop_battery_offer,hop_battery_offer,model_hop_battery_offer,,1,1,1,1
+access_hop_battery_offer_line,hop_battery_offer_line,model_hop_battery_offer_line,,1,1,1,1
+access_hop_battery_offer_report_wizard,hop.battery.offer.report.wizard,model_hop_battery_offer_report_wizard,,1,1,1,1
+

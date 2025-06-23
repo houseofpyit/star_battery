@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!-- Wizard Form View -->
+    <record id="view_hop_replacement_battery_wizard_form" model="ir.ui.view">
+        <field name="name">hop.replacement.battery.wizard.form</field>
+        <field name="model">hop.replacement.battery.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Replacement Battery Wizard">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="barcode_id" required="1" force_save="1" 
+                                options="{'no_create_edit': True,'no_create': True, 'no_quick_create': True}" />
+                            <field name="replacement_barcode_id" required="1" force_save="1" 
+                                options="{'no_create_edit': True,'no_create': True, 'no_quick_create': True}" />
+
+                        </group>
+                        <group>
+                            <field name="party_id" force_save="1" 
+                                options="{'no_create_edit': True,'no_create': True, 'no_quick_create': True}"
+                                readonly="1" />
+                            <field name="date"  force_save="1" readonly="1" />
+                            <field name="salebill_id" force_save="1" 
+                                options="{'no_create_edit': True,'no_create': True, 'no_quick_create': True}"
+                                readonly="1" />
+                            <field name="warranty_end_date"  force_save="1"  readonly="1" />
+                        </group>
+                        </group>
+                        <notebook>
+                            <page string="Replacement Details">
+                                <field name="line_ids">
+                                    <tree editable="bottom" delete="0" create="0">
+                                        <field name="date"  force_save="1" readonly="1" />
+                                        <field name="barcode_id" force_save="1"  readonly="1" />
+                                    </tree>
+                                </field>
+                            </page>
+                        </notebook>
+
+                    
+                    <footer>
+                        <button string="Confirm" type="object" name="action_confirm"
+                            class="oe_highlight" />
+                        <button string="Cancel" class="oe_link" special="cancel" />
+                    </footer>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Action to Open Wizard -->
+    <record id="action_hop_replacement_battery_wizard" model="ir.actions.act_window">
+        <field name="name">Replacement Battery</field>
+        <field name="res_model">hop.replacement.battery.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_hop_replacement_battery_wizard_form" />
+        <field name="target">new</field>
+    </record>
+
+    <!-- Menu Item for Wizard -->
+    <menuitem id="menu_hop_replacement_battery_wizard"
+        name="Replacement Wizard"
+        parent="menu_hop_replacement_battery_root"
+        action="action_hop_replacement_battery_wizard"
+        sequence="1" />
+
+</odoo>
