@@ -37,26 +37,23 @@ class BatteryOfferReportWizard(models.TransientModel):
         active_offer_records = False
         if not self.offer_ids:
             today = date.today()
-            active_offer_records = self.env['hop.battery.offer'].search([('from_date','<=',today),('to_date','>=',today)])
+            active_offer_records = self.env['hop.battery.offer'].sudo().search([('from_date','<=',today),('to_date','>=',today)])
         else:
             active_offer_records =  self.offer_ids
         results_list = []
         for line in active_offer_records:
             query = """ SELECT 
                     COALESCE(SUM(x.billpcs), 0) as sale, COALESCE(SUM(x.returnpcs), 0) AS sale_return, 
-                    x.party_id,
-                    x.product_id,
-                    x.party_name,
-                    x.product_name
+                    x.party_id,x.product_id,x.party_name,x.product_name
                 FROM ( """
             query += f""" select COALESCE(sum(b.pcs),0) as billpcs ,0 as returnpcs , a.party_id,b.product_id ,c.name as party_name , d.name as product_name 
-                            from hop_salebill as a 
-                            inner join hop_salebill_line as b on a.id = b.mst_id 
-							left join res_partner as c on c.id = a.party_id
-							left join hop_product_mst as d on d.id = b.product_id
+                        from hop_salebill as a 
+                        inner join hop_salebill_line as b on a.id = b.mst_id 
+                        left join res_partner as c on c.id = a.party_id
+                        left join hop_product_mst as d on d.id = b.product_id
 
-                            where a.date <=  '{str(self.env.user.fy_to_date)}'
-                            and a.date >=  '{str(self.env.user.fy_from_date)}' """
+                        where a.date <=  '{str(self.env.user.fy_to_date)}'
+                        and a.date >=  '{str(self.env.user.fy_from_date)}' """
             if self.party_ids:
                 query += f""" and a.party_id in {self.tuple_return(self.party_ids.ids)} """
             
@@ -64,12 +61,12 @@ class BatteryOfferReportWizard(models.TransientModel):
                 query += f""" and b.product_id in {self.tuple_return(line.line_ids.mapped('product_id').ids)} """
             query += f""" group by a.party_id,b.product_id ,c.name ,d.name """
                             
-            query += f"""                union all 
+            query += f"""   union all 
                             select COALESCE(sum(b.pcs),0) as billpcs ,0 as returnpcs, a.party_id,b.product_id ,c.name as party_name , d.name as product_name
                             from hop_salebillreturn as a 
                             inner join hop_salebillreturn_line as b on a.id = b.mst_id 
-							left join res_partner as c on c.id = a.party_id
-							left join hop_product_mst as d on d.id = b.product_id
+                            left join res_partner as c on c.id = a.party_id
+                            left join hop_product_mst as d on d.id = b.product_id
                             where a.date <=  '{str(self.env.user.fy_to_date)}'
                             and a.date >=  '{str(self.env.user.fy_from_date)}' """
             
@@ -92,7 +89,6 @@ class BatteryOfferReportWizard(models.TransientModel):
                 sale ,sale_return, party_id, product_id, party_name, product_name = record
                 target_qty = line.line_ids.filtered(lambda l: l.product_id.id == product_id).qty
                 total_sale = sale - sale_return
-                print("***********",target_qty,total_sale)
                 if target_qty <= total_sale:
                     status = 'Done'
                 else:

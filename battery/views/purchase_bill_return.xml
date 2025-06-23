@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="inherit_barcode_purchasebillreturn_form" model="ir.ui.view">
+        <field name="name">Purchase Bill Return</field>
+        <field name="model">hop.purchasebillreturn</field>
+        <field name="inherit_id" ref="transaction.purchasebillreturn_form" />
+        <field name="arch" type="xml">
+         
+             <xpath expr="//tree/field[@name='hsn_id']" position="after">
+                <field name="barcode_ids" width="20%" widget="many2many_tags"/>
+            </xpath>
+        </field>
+    </record>
+
+
+
+    <record id="inherit_hop_fatch_purchasebill_record" model="ir.ui.view">
+        <field name="name">hop_fatch_purchasebill_record</field>
+        <field name="model">hop.fatch.purchasebill.record</field>
+        <field name="inherit_id" ref="transaction.hop_fatch_purchasebill_record" />
+        <field name="arch" type="xml">
+         
+             <xpath expr="//field[@name='product_id']" position="after">
+                <field name="barcode_ids" width="20%" widget="many2many_tags"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

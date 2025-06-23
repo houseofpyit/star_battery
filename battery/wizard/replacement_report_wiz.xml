@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="hop_replacement_report_view_form" model="ir.ui.view">
+        <field name="name">hop.replacement.report.wiz.form</field>
+        <field name="model">hop.replacement.report.wiz</field>
+        <field name="arch" type="xml">
+            <form string="Replacement Report">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="from_date" />
+                            <field name="party_ids" widget="many2many_tags" options="{'no_create':True}"/>
+                        </group>
+                        <group> 
+                            <field name="to_date" />                            
+                        </group>
+                    </group>
+                </sheet>
+                <footer>
+                    <button name="action_generate" type="object" string="Generate" class="oe_highlight" />
+                    <button string="Cancel" class="btn btn-secondary" special="cancel" />
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_hop_replacement_report" model="ir.actions.act_window">
+        <field name="name">Replacement Report</field>
+        <field name="res_model">hop.replacement.report.wiz</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <menuitem id="menu_hop_replacement_report" 
+            name="Replacement Report"
+            parent="battery.menu_hop_replacement_battery_root"
+            action="action_hop_replacement_report"/>
+
+</odoo>

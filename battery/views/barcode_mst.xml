@@ -1,14 +1,46 @@
 <odoo>
+
+<record id="view_purchasebill_line_barcode_form" model="ir.ui.view">
+        <field name="name">purchasebill.line.barcode.form</field>
+        <field name="model">hop.purchasebill.line.barcode</field>
+        <field name="arch" type="xml">
+            <form string="Purchase Bill Line Barcode">
+                <sheet>
+                    <group>
+                    <group>
+                      <field name="product_id"/>
+                      <field name="name"/>
+                      <field name="stage"/>
+                      <button name="update_status" type="object" string="Update Status" class="oe_stat_button" groups="base.group_no_one" icon="fa-"/>
+                    </group>
+                        <group>
+                        <field name="origin"/>
+                        <field name="purchase_name"/>
+                        <field name="is_manual"  readonly="1"/>
+                        <field name="date" force_save="1" invisible="1" />
+                        <field name="purchase_id" force_save="1" groups="base.group_no_one" />
+                        <field name="replace_id" force_save="1" groups="base.group_no_one"/>
+                        <field name="sale_id" force_save="1" groups="base.group_no_one"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
     <record id="view_purchasebill_line_barcode_tree" model="ir.ui.view">
         <field name="name">purchase.bill.line.barcode.tree</field>
         <field name="model">hop.purchasebill.line.barcode</field>
         <field name="arch" type="xml">
-            <tree string="Barcodes" create="0" edit="0">
-                <field name="name" force_save="1" readonly="1"/>
-                <field name="stage" force_save="1" readonly="1"/>
-                <field name="product_id" force_save="1" readonly="1"/>
-                <field name="origin" force_save="1" readonly="1"/>
-                <field name="purchase_name" force_save="1" readonly="1"/>
+            <tree string="Barcodes" >
+                <field name="name" force_save="1" />
+                <field name="stage" force_save="1" />
+                <field name="product_id" force_save="1"/>
+                <field name="origin" force_save="1" />
+                <field name="purchase_name" force_save="1" />
+                <field name="date" force_save="1" />
+                <field name="purchase_id" force_save="1" groups="base.group_no_one" />
+                <field name="replace_id" force_save="1" groups="base.group_no_one"/>
+                <field name="sale_id" force_save="1" groups="base.group_no_one"/>
             </tree>
         </field>
     </record>
@@ -22,11 +54,13 @@
                 <field name="name"/>
                 <field name="stage"/>
                 <field name="product_id"/>
+                 <field name="date"/>
                 <filter name="filter_stage" string="Stage" domain="[('stage', '!=', False)]"/>
                 <filter name="filter_product" string="Has Product" domain="[('product_id', '!=', False)]"/>
 
                 <!-- Group By Options -->
                 <group expand="0">
+                    <filter name="group_by_date" string="Group by Date" context="{'group_by': 'date'}"/>
                     <filter name="group_by_stage" string="Group by Stage" context="{'group_by': 'stage'}"/>
                     <filter name="group_by_product" string="Group by Product" context="{'group_by': 'product_id'}"/>
                     <filter name="group_by_origin" string="Group by Origin" context="{'group_by': 'origin'}"/>
@@ -39,12 +73,18 @@
     <record id="action_purchasebill_line_barcode" model="ir.actions.act_window">
         <field name="name">Barcodes</field>
         <field name="res_model">hop.purchasebill.line.barcode</field>
-        <field name="view_mode">tree,search</field>
+        <field name="view_mode">tree,form,search</field>
+         <field name="context">{'default_is_manual':True}</field>
         <field name="search_view_id" ref="view_purchasebill_line_barcode_search"/>
     </record>
 
+    <menuitem id="menu_hop_barcode_main" 
+    name="Barcodes" 
+    sequence="11" 
+    web_icon="battery,static/description/img/barcode.png" />
+
     <menuitem id="menu_purchasebill_line_barcode_root"
               name="Barcodes"
-              parent="master.mst_tbl_menu" 
+              parent="battery.menu_hop_barcode_main" 
               action="action_purchasebill_line_barcode"/>
 </odoo>

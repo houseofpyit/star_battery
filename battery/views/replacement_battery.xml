@@ -13,10 +13,11 @@
         <field name="name">hop.replacement.battery.tree</field>
         <field name="model">hop.replacement.battery</field>
         <field name="arch" type="xml">
-            <tree create="0">
+            <tree >
                 <field name="date"/>
                 <field name="party_id" force_save="1" options="{'no_create_edit': True,'no_create': True, 'no_quick_create': True}"/>
-                <field name="salebill_id" force_save="1" options="{'no_create_edit': True,'no_create': True, 'no_quick_create': True}" />
+                <field name="salebill_id" force_save="1"  invisible ="1"/>
+                <field name="sale_bill_name" force_save="1"/>
                 <field name="barcode_id" force_save="1" options="{'no_create_edit': True,'no_create': True, 'no_quick_create': True}"/>
             </tree>
         </field>
@@ -27,28 +28,32 @@
         <field name="name">hop.replacement.battery.form</field>
         <field name="model">hop.replacement.battery</field>
         <field name="arch" type="xml">
-            <form string="Battery Replacement" create="0">
+            <form string="Battery Replacement" >
                 <sheet>
                     <group>
                         <group>
-                            <field name="barcode_id" force_save="1"  options="{'no_create_edit': True,'no_create': True, 'no_quick_create': True}" readonly="1"/>
-                            <field name="party_id" force_save="1"  options="{'no_create_edit': True,'no_create': True, 'no_quick_create': True}" readonly="1"/>
+                            <field name="replacement_type" required="1"/>
+                            <field name="barcode_id" force_save="1"  options="{'no_create_edit': True,'no_create': True, 'no_quick_create': True}" />
+                            <field name="party_id" force_save="1"  options="{'no_create_edit': True,'no_create': True, 'no_quick_create': True}" />
                         </group>
                         <group>
-                             <field name="date"  force_save="1" readonly="1"/>
-                             <field name="product_id" force_save="1" readonly="1" invisible="1" />
-                             <field name="warranty_end_date"  force_save="1" readonly="1"/>
-                            <field name="salebill_id" force_save="1"  options="{'no_create_edit': True,'no_create': True, 'no_quick_create': True}" readonly="1"/>
+                             <field name="date"  force_save="1" />
+                             <field name="product_id" force_save="1"  />
+                             <field name="warranty_end_date"  force_save="1" />
+                             <field name="sale_bill_name" force_save="1"/>
+                            <field name="salebill_id" force_save="1" invisible="1" readonly="1"/>
                         </group>
                     </group>
                     <notebook>
                         <page string="Replacement Details">
                             <field name="line_ids">
                                 <tree editable="bottom" delete="0" >
-                                    <field name="date"  force_save="1" readonly="1"/>
-                                    <field name="barcode_id"  force_save="1" readonly="1"/>
-                                    <field name="salebill_id"  force_save="1" readonly="1"/>
-                                    <field name="product_id" force_save="1" readonly="1" invisible="1" />
+                                    <field name="date"  force_save="1" />
+                                    <field name="barcode_id"  force_save="1" />
+                                    <field name="replacement_barcode_id" force_save="1" options="{'no_quick_create' : True}" attrs="{'column_invisible': [('parent.replacement_type', '=', 'self')]}"/>
+                                    <field name="salebill_id" invisible="1" force_save="1" />
+                                     <field name="sale_bill_name" force_save="1"/>
+                                    <field name="product_id" force_save="1"  />
                                 </tree>
                             </field>
                         </page>
@@ -66,7 +71,8 @@
             <search>
                 <field name="party_id" readonly="1"/>
                 <field name="date" readonly="1"/>
-                <field name="salebill_id" readonly="1"/>
+                <field name="salebill_id" readonly="1" invisible="1"/>
+                 <field name="sale_bill_name" force_save="1"/>
                 <field name="barcode_id" readonly="1"/>
                 <field name="warranty_end_date" readonly="1"/>
             </search>

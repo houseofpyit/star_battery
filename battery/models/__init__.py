@@ -4,3 +4,9 @@ from . import salbill
 from . import replacement_battery
 from . import battery_offer
 from . import inherit_stock_reprt
+from . import purchase_return
+from . import salebill_return
+from . import res_partner
+from . import hop_receipt
+from . import price_list
+from . import agent_sale

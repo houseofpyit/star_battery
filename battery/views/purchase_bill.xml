@@ -5,12 +5,42 @@
         <field name="model">hop.purchasebill</field>
         <field name="inherit_id" ref="transaction.purchasebill_form" />
         <field name="arch" type="xml">
-            <xpath expr="//form/group/group/field[@name='hsn_id']" position="after">
-                <field name="barcode" />
-                </xpath>
-            <xpath expr="//form/group[@name='line_id']" position="after">
-                <field name="barcode_line_id">
+         <xpath expr="//tree/field[@name='hsn_id']" position="after">
+                <field name="barcode" width="100px"/>
+                  <field name="barcode_line_id" invisible="1">
                     <tree editable="1">
+                        <field name="product_id"  force_save="1" />
+                        <field name="name" />
+                        <field name="stage"  force_save="1" invisible="1"/>
+                        <field name="origin" force_save="1" invisible="1" />
+                        <field name="line_mst_id" force_save="1" invisible="1" readonly="1" />
+                        <field name="purchase_name" force_save="1" invisible="1" readonly="1" />
+                        <field name="date" force_save="1" invisible="1" readonly="1" />
+                    </tree>
+                </field>
+            </xpath>
+            <xpath expr="//field[@name='due_days']" position="after">
+                <field name="due_date" readonly="1" force_save="1"/> 
+                <field name="is_opening_strock"  widget="boolean_toggle"/>
+                    <button name="update_purcgase_id" type="object" string="update Purchase" groups="base.group_no_one"/>
+                    <button name="update_due_date" type="object" string="Ppdate Due Date" groups="base.group_no_one" />
+                    
+            </xpath>
+            <xpath expr="//form/group/group/field[@name='hsn_id']" position="after">
+                <field name="barcode" width="100px"/>
+            </xpath>
+            <xpath expr="//tree/field[@name='disc_per']" position="attributes">
+               <attribute name="optional">hide</attribute>
+            </xpath>
+            <xpath expr="//tree/field[@name='disc_amt']" position="attributes">
+              <attribute name="optional">hide</attribute>
+            </xpath>
+            <xpath expr="//tree/field[@name='add_amt']" position="attributes">
+               <attribute name="optional">hide</attribute>
+            </xpath>
+            <!-- <xpath expr="//form/group[@name='line_id']" position="after">
+                <field name="barcode_line_id" invisible="1">
+                    <tree editable="0">
                         <field name="product_id"  force_save="1" />
                         <field name="name" />
                         <field name="stage"  force_save="1" invisible="1"/>
@@ -19,8 +49,21 @@
                         <field name="purchase_name" force_save="1" invisible="1" readonly="1" />
                     </tree>
                 </field>
-            </xpath>
+            </xpath> -->
         </field>
     </record>
-
+    <record id="purchasebill_tree_inherited" model="ir.ui.view">
+        <field name="name">hop.purchasebill.form.inherit</field>
+        <field name="model">hop.purchasebill</field>
+        <field name="inherit_id" ref="transaction.purchasebill_tree"/>
+        <field name="arch" type="xml">
+        <xpath expr="//tree/field[@name='party_id']"  position="after">
+            <field name="mobile_no" />
+            <field name="city_id" />
+        </xpath>
+        <xpath expr="//tree/field[@name='due_days']"  position="after">
+            <field name="due_date" optional="hide"/>
+        </xpath>
+        </field>
+    </record>
 </odoo>

@@ -1,0 +1,357 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <data>
+        <template id="transaction.bill_ship_print">
+            <t t-call="web.html_container">
+                <style>
+                    .ser_font{
+                        font-size:30px;
+                        font-family: "Times New Roman" !important;
+                    }
+                </style>
+                <t t-foreach="docs" t-as="o">
+                    <style>
+                        table{
+                            border:1px solid black; border-bottom:1px solid black;
+                            border-collapse: collapse;
+                        }
+                    </style>
+                    <!-- <t t-call="web.external_layout"> -->
+                        
+                    <div class="page">
+                        <table width="100%" style="border:none;">
+                            <table width="100%" style="border:none;" v-align="top" >
+
+                                <tr>
+                                    <td colspan="2" style="text-align: center; top-margin:35px;height:50px;font-family:serif;padding-top:10px;">
+                                        <h1 class="ser_font"><b><span t-esc="o.company_id.name"/></b></h1>
+                                    </td>
+                                </tr>    
+                                <tr>
+                                    <td colspan="2" style="text-align: center;">
+                                        <span  t-esc="o.company_id.street"/>,<span  t-esc="o.company_id.street2"/>,<span  t-esc="o.company_id.city"/>,<span  t-esc="o.company_id.state_id.name"/>,<span  t-esc="o.company_id.country_id.name"/>,<span  t-esc="o.company_id.zip"/>
+                                        
+                                    </td>
+                                </tr>  
+                                <tr>
+                                    <td colspan="2" style="text-align: center; ">
+                                        <b><span>Phone No:</span>
+                                        <span  t-esc="o.company_id.phone"/></b>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="text-align: left;padding-left:5px;">
+                                        <b><span>Email:</span>
+                                        <span  t-esc="o.company_id.email"/></b>
+                                    </td>
+                                    <td style="text-align: right; ">
+                                        <b><span>GSTIN:</span>
+                                        <span  t-esc="o.company_id.gstno"/></b><br/>
+                                        <spa>Estimation</spa>
+                                    </td>
+                                </tr>    
+                            </table>  
+                            <table  width="100%" style="border:none;">
+                                    <tr>
+                                        <td>
+                                            <hr style="border-top: 2px solid black;"></hr>
+                                            <center><h3 style="font-weight:10px;padding-top:2px;">Bill Of Supply</h3></center>
+                                            <hr style="border-top: 2px solid black;"></hr>
+                                        </td>
+                                    </tr>
+                            </table>
+                            <table width="100%" style="border:1px solid black;border-bottom:none;border:none;">
+                                <tr>
+                                    <td style="text-align: left;width:50%;border:1px solid black;border-left:none;border-top:none;padding-left:5px;">
+                                        <b>invoice No: <span  t-esc="o.name"/></b><br/>
+                                        <b><span>invoice Date : </span></b><span  t-esc="o.date.strftime('%d/%m/%Y')"/><br/>
+                                        <b><span>Agent: </span></b><span  t-esc="o.agent_id.name"/><br/>
+                                    </td>
+                                    <td style="text-align: left;width:50%;border-right:none;border-top:none;border:1px solid black;padding-left:5px;border-top:none;border-right:none;">
+                                        <b><span>Transport : </span></b><span  t-esc="o.transport_id.name"/><br/>
+                                        <b><span>Lr No : </span></b><span  t-esc="o.lr_no"/><br/>
+                                    </td>
+                                </tr>
+                            
+                        
+                                <tr>
+                                    <td style="border-left:none;width:50%;border:1px solid black;padding-top:5px;border-left:none;">
+                                        <center><b><span>Billed to </span></b></center>
+                                    </td>
+                                    <td style="width:50%;border-right:none;border:1px solid black;padding-top:5px;border-right:none;">
+                                        <center><b><span>Shipped to  </span></b></center>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="text-align: left;width:50%;border-left:none;border-top:none;border-bottom:none;border:1px solid black;padding-left:5px;border-left:none;">
+                                        <b><span>Party : </span></b><span  t-esc="o.party_id.name"/><br/>
+                                        <b><span>Phone : </span></b><span  t-esc="o.party_id.mobile"/><br/>
+                                        <b><span>Address : </span></b><span  t-esc="o.party_id.addr1"/>,<span  t-esc="o.party_id.addr2"/>,<span  t-esc="o.party_id.city_id.name"/>-<span  t-esc="o.party_id.pincode"/><br/>
+                                        <b>GSTIN : <span  t-esc="o.party_id.gstno"/></b><br/>
+                                        <b><span>State : </span></b><span  t-esc="o.party_id.state_id.name"/><br/>
+                                    </td>
+                                    <td style="text-align: left;width:50%;border-right:none;border-top:none;border-bottom:none;border:1px solid black;padding-left:5px;border-right:none;">
+                                        <t t-if="o.haste_id">
+                                            <b><span>Party : </span></b><span  t-esc="o.haste_id.name"/><br/>
+                                            <b><span>Address : </span></b><span  t-esc="o.haste_id.addr1"/>,<span  t-esc="o.haste_id.addr2"/><br/>
+                                            <b>GSTIN : <span  t-esc="o.haste_id.gstno"/></b><br/>
+                                            <b><span>City : </span></b><span  t-esc="o.haste_id.city_id.name"/>,<b><span>State : </span></b><span  t-esc="o.haste_id.state_id.name"/><br/>
+                                        </t>
+                                        <t t-else="">   
+                                            <b><span>Party : </span></b><span  t-esc="o.delivery_address_id.contact_name"/><br/>
+                                            <b><span>Address : </span></b><span  t-esc="o.delivery_address_id.addr1"/>,<span  t-esc="o.delivery_address_id.addr2"/><br/>
+                                            <b><span>City : </span></b><span  t-esc="o.delivery_address_id.city_id.name"/>,<b><span>State : </span></b><span  t-esc="o.delivery_address_id.state_id.name"/><br/>
+                                        </t>
+                                    </td>
+                                </tr>
+                            </table>
+                            <table width="100%" style="border:1px solid black;border-top:none;">
+                                <tr>
+                                    <th style="background-color:#ebebe0;width:5%;text-align:center;border:1px solid black;border-top:none;"><b>SRL</b></th>
+                                    <th style="background-color:#ebebe0;width:20%;text-align:center;border:1px solid black;border-top:none;"><b>ITEM NAME</b></th>
+                                    <th style="background-color:#ebebe0;width:20%;text-align:center;border:1px solid black;border-top:none;"><b>WARRANTY</b></th>
+                                    <th style="background-color:#ebebe0;width:30%;text-align:center;border:1px solid black;border-top:none;"><b>Barcode</b></th>
+                                    <!-- <th style="background-color:#ebebe0;width:10%;text-align:center;border:1px solid black;border-top:none;"><b>HSNCode</b></th> -->
+                                    <th style="background-color:#ebebe0;width:10%;text-align:center;border:1px solid black;border-top:none;"><b>Unit</b></th>
+                                    <th style="background-color:#ebebe0;width:10%;text-align:center;border:1px solid black;border-top:none;"><b>RATE</b></th>
+                                    <th style="background-color:#ebebe0;width:15%;text-align:center;border:1px solid black;border-top:none;"><b>AMOUNT</b></th>
+                                </tr>
+                                <t t-set="srl" t-value="0" />
+                                <t t-set="tot_pcs" t-value="0" />
+                                <t t-set="tot_meter" t-value="0" />
+                                <t t-set="tot_final_amt" t-value="0" />
+                                
+                                <t t-foreach="o.line_id" t-as="item">
+                                    <t t-set="tot_pcs" t-value="tot_pcs + item.pcs" />
+                                    <t t-set="tot_meter" t-value="tot_meter + item.meter" />
+                                    <t t-set="tot_final_amt" t-value="tot_final_amt + item.final_amt" />
+                                </t>
+                                <t t-set="srl" t-value="0" />
+                                <t t-foreach="o.print_line_mapped()" t-as="item">
+                                    <t t-set="srl" t-value="srl + 1" />
+                                    <tr>
+                                        <td style="text-align: center;border:1px solid black;">
+                                            <span><span t-esc="srl"></span></span>
+                                        </td>
+                                        <td style="text-align: left;padding-left:5px;border:1px solid black;">
+                                            <span><span t-esc="item.get('product_name')"></span></span>
+                                        </td>
+                                        <td style="text-align: left;padding-left:5px;border:1px solid black;">
+                                           <span t-esc="item.get('warranty')"/> - <span t-esc="item.get('warranty_end_date')"/>
+                                        </td>
+                                        <td style="text-align: center;padding-right:5px;border:1px solid black;">
+                                            <span ><span t-esc="item.get('barcode')"></span></span>
+                                        </td>
+                                        <!-- <td style="text-align: right;padding-right:5px;border:1px solid black;">
+                                            <span ><span t-esc="item.get('hsn_name')"></span></span>
+                                        </td> -->
+                                        <td style="text-align: right;padding-right:5px;border:1px solid black;">
+                                            <span ><span t-esc="'%.2f'% item.get('pcs')"></span></span>
+                                        </td>
+                                        <td style="text-align: right;padding-right:5px;border:1px solid black;">
+                                            <span ><span t-esc="'%.2f'% (item.get('rate'))"></span></span>
+                                        </td>
+                                        <td style="text-align: right;padding-right:5px;border:1px solid black;">
+                                            <span ><span t-esc="'%.2f'% (item.get('amount'))"></span></span>
+                                        </td>
+                                    </tr>
+                                </t>
+
+
+                                <t t-foreach="range(12-srl)" t-as="l">
+                                    <tr>
+                                        <td style="padding-left:3px;border:1px solid black;border-top:none;border-bottom:none;">
+                                            <br></br>
+                                        </td>
+                                        <td style="padding-left:3px;border:1px solid black;border-top:none;border-bottom:none;">
+                                            <br></br>
+                                        </td>
+                                        <td style="padding-left:3px;border:1px solid black;border-top:none;border-bottom:none;">
+                                            <br></br>
+                                        </td>
+                                        <td style="padding-left:3px;border:1px solid black;border-top:none;border-bottom:none;">
+                                            <br></br>
+                                        </td>
+                                        <td style="padding-left:3px;text-align:right;border:1px solid black;border-top:none;border-bottom:none;">
+                                            <br></br>
+                                        </td>
+                                        <td style="padding-left:3px;text-align:right;border:1px solid black;border-top:none;border-bottom:none;">
+                                            <br></br>
+                                        </td>
+                                        <td style="padding-left:3px;border:1px solid black;border-top:none;border-bottom:none;">
+                                            <br></br>
+                                        </td>
+                                    </tr>
+                                </t>
+                                <tr>
+                                    <td style="border-left:none;border:1px solid black;"></td>
+                                    <td style="border-left:none;border:1px solid black;"></td>
+                                    <td style="border-left:none;border:1px solid black;"></td>
+                                    <td style="border-left:none;border:1px solid black;"></td>
+                                    <!-- <td style="border-left:none;border:1px solid black;"></td> -->
+                                    <td style="border-left:none;border:1px solid black;text-align:right;padding-right:5px;">
+                                        <t t-esc="tot_pcs" />
+                                    </td>
+                                    <td style="border-left:none;border:1px solid black;"></td>
+                                    <td style="border-left:none;border:1px solid black;text-align:right;padding-right:5px;">
+                                        <t t-esc="'%.2f'% (tot_final_amt)" />
+                                    </td>
+                                </tr>
+                            </table>
+                    
+                            <table style="width:100%;border:none;">
+                                <tr style="background-color:#F4F0E0;">
+                                    <td style="width:30%;text-align: left;">
+                                        <br/><span><b>Amount (In Words) : </b></span><span style="font-weight:bold;" t-esc="o.amount_to_text((o.net_amt), 'INR').replace('PAISA', ' ONLY')"/>
+                                    </td>
+                                </tr>
+                                <!-- <tr style="background-color:#F4F0E0;">
+                                    <td style="width:30%;text-align: left;">
+                                    <br/><span><b>Pending Outstanding : </b></span><span style="font-weight:bold;" t-esc="'%.2f'% (o.net_amt + o.party_pre_balance())"/>                    
+                                    </td>
+                                </tr> -->
+                                
+                            </table>
+                     
+                            <table width="100%" style="border-bottom:none;border:none;">
+                                <tr>
+                                    <td style="text-align: left;padding-top:5px;padding-left:5px;" width="65%">
+                                        <table style="border:none;">
+                                            <tr>
+                                                <td>
+                                                    <b><span>Remarks : </span></b><span  t-esc="o.remarks"/><br/>
+                                                    <b><span>Bank Name: </span></b><span  t-esc="o.party_id.bank_name"/><br/>
+                                                    <b><span>Account No: </span></b><span  t-esc="o.party_id.acc_no"/><br/>
+                                                    <b><span>IFSC : </span></b><br/>
+                                                    <span>1. Payment to be made by payee A/c Cheque or Draft.</span><br/> 
+                                                    <span>2. Any complain for goods should be made within 7 days,</span><br/>
+                                                    <span>after that no complains will be entertained.</span><br/>
+                                                    <span>3. Interest @24% per annum will be charged after due date of the bill.</span><br/>
+                                                    <span>4. We are not responsible for the loss or damage during tranit.</span><br/>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                    <td style="text-align: right;" width="35%">
+                                        <table style="border:none;">
+                                            <tr>
+                                                <td width="15%" >
+                                                    <b>Discount </b>
+                                                </td>
+                                                <td width="15%" style="text-align:right;padding-right:5px;">
+                                                    <span  t-esc="'%.2f'% o.tot_disc_amt"/><br/>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    <b>Taxable Value </b>
+                                                </td>
+                                                <td style="text-align:right;padding-right:5px;">
+                                                    <span  t-esc="'%.2f'% o.tot_taxable"/><br/>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    <b>CGST </b>
+                                                </td>
+                                                <td style="text-align:right;padding-right:5px;">
+                                                    <span  t-esc="'%.2f'% o.tot_cgst"/><br/>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    <b>SGST </b>
+                                                </td>
+                                                <td style="text-align:right;padding-right:5px;">
+                                                    <span  t-esc="'%.2f'% o.tot_sgst"/><br/>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    <b>IGST </b>
+                                                </td>
+                                                <td style="text-align:right;padding-right:5px;">
+                                                    <span  t-esc="'%.2f'% o.tot_igst"/><br/>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td style="border-top:1px solid black;padding-right:5px;">
+                                                    <b>Net Amount </b>
+                                                </td>
+                                                <td style="text-align:right;border-top:1px solid black;padding-right:5px;">
+                                                    <span  t-esc="'%.2f'% o.net_amt"/><br/>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <t t-if="o.bank_amt">
+                                                    <td>
+                                                        <b>Bank</b>
+                                                    </td>
+                                                    <td style="text-align:right;padding-right:5px;">
+                                                        <span  t-esc="'%.2f'% o.bank_amt"/><br/>
+                                                    </td>
+                                                </t>
+                                            </tr>
+                                            <tr>
+                                                <t t-if="o.payment_amt">
+                                                    <td>
+                                                        <b>Cash</b>
+                                                    </td>
+                                                    <td style="text-align:right;padding-right:5px;">
+                                                        <span  t-esc="'%.2f'% o.payment_amt"/><br/>
+                                                    </td>
+                                                </t>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    <b>Total Pendding Amount</b>
+                                                </td>
+                                                <td style="text-align:right;padding-right:5px;">
+                                                    <span style="font-weight:bold;" t-esc="'%.2f'% (o.net_amt + o.party_pre_balance())"/><br/>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                            </table>
+                            <table width="100%" style="border-top:none;border-bottom:none;border-left:none;border-right:none;">
+                                <tr style="text-align:right;">
+                                    <br/>
+                                    <td style="padding-right:5px;border-bottom:none;border-left:none;border-right:none;">
+                                        For,
+                                        <b><span t-esc="o.company_id.name"/></b><br/>
+                                    </td>
+                                </tr>
+                                <tr><td><br/></td></tr>
+                                <tr>
+                                    <td style="text-align:right;padding-right:5px;border-bottom:none;border-left:none;border-right:none;">
+                                        <b>Authorised Sign</b>
+                                    </td>
+                                </tr>
+                            </table>
+                            <p style="page-break-before:always;"> </p>
+                        </table>
+                    </div>
+                    
+                    <div class="footer">
+                        <div class="col-xs-3" style="width: 100%; margin: 0 auto;border-top: 1px solid black;border:none;">
+                            <table style="width:100%;border:none;border-bottom:none;">
+                                <tr>
+                                    <td style="text-align: right;padding-top:0px;">
+                                        <span>  Page</span>
+                                        <span class="page" />
+                                        of
+                                        <span class="topage" />
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </t>
+
+            </t>
+
+        </template>
+    </data>
+</odoo>

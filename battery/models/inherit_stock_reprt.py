@@ -14,125 +14,125 @@ class inheritStockReport(models.Model):
     _inherit="stock.report"
     _description = 'Stock Report'
     
-    def opening_stock(self,from_date,to_date,product_ids,category_ids,company_ids,fields=False,join_table=False,condition=False,group_by=False): 
+    def opening_stock(self,from_date,to_date,product_ids,category_ids,company_ids,fields=False,join_table=False,condition=False,group_by=False,sub_category_ids=False):
     
         fields = " , 0 as replace"
-        res = super(inheritStockReport, self).opening_stock(from_date,to_date,product_ids,category_ids,company_ids,fields,join_table,condition,group_by)
+        res = super(inheritStockReport, self).opening_stock(from_date,to_date,product_ids,category_ids,company_ids,fields=fields,join_table=join_table,condition=condition,group_by=group_by,sub_category_ids=sub_category_ids)
         return res
     
-    def purchase_order(self,from_date,to_date,product_ids,category_ids,company_ids,fields=False,join_table=False,condition=False,group_by=False): 
+    def purchase_order(self,from_date,to_date,product_ids,category_ids,company_ids,fields=False,join_table=False,condition=False,group_by=False,sub_category_ids=False):
         fields = " , 0 as replace"
-        res = super(inheritStockReport, self).purchase_order(from_date,to_date,product_ids,category_ids,company_ids,fields,join_table,condition,group_by)
+        res = super(inheritStockReport, self).purchase_order(from_date,to_date,product_ids,category_ids,company_ids,fields=fields,join_table=join_table,condition=condition,group_by=group_by,sub_category_ids=sub_category_ids)
         return res
     
-    def purchasebill(self,from_date,to_date,product_ids,category_ids,company_ids,fields=False,join_table=False,condition=False,group_by=False): 
+    def purchasebill(self,from_date,to_date,product_ids,category_ids,company_ids,fields=False,join_table=False,condition=False,group_by=False,sub_category_ids=False):
         fields = " , 0 as replace"
-        res = super(inheritStockReport, self).purchasebill(from_date,to_date,product_ids,category_ids,company_ids,fields,join_table,condition,group_by)
+        res = super(inheritStockReport, self).purchasebill(from_date,to_date,product_ids,category_ids,company_ids,fields=fields,join_table=join_table,condition=condition,group_by=group_by,sub_category_ids=sub_category_ids)
         return res
     
-    def salebill_return(self,from_date,to_date,product_ids,category_ids,company_ids,fields=False,join_table=False,condition=False,group_by=False): 
+    def salebill_return(self,from_date,to_date,product_ids,category_ids,company_ids,fields=False,join_table=False,condition=False,group_by=False,sub_category_ids=False):
         fields = " , 0 as replace"
-        res = super(inheritStockReport, self).salebill_return(from_date,to_date,product_ids,category_ids,company_ids,fields,join_table,condition,group_by)
+        res = super(inheritStockReport, self).salebill_return(from_date,to_date,product_ids,category_ids,company_ids,fields=fields,join_table=join_table,condition=condition,group_by=group_by,sub_category_ids=sub_category_ids)
         return res
     
-    def sale_order(self,from_date,to_date,product_ids,category_ids,company_ids,fields=False,join_table=False,condition=False,group_by=False): 
+    def sale_order(self,from_date,to_date,product_ids,category_ids,company_ids,fields=False,join_table=False,condition=False,group_by=False,sub_category_ids=False):
         fields = " , 0 as replace"
-        res = super(inheritStockReport, self).sale_order(from_date,to_date,product_ids,category_ids,company_ids,fields,join_table,condition,group_by)
+        res = super(inheritStockReport, self).sale_order(from_date,to_date,product_ids,category_ids,company_ids,fields=fields,join_table=join_table,condition=condition,group_by=group_by,sub_category_ids=sub_category_ids)
         return res
     
-    def salebill(self,from_date,to_date,product_ids,category_ids,company_ids,fields=False,join_table=False,condition=False,group_by=False): 
+    def salebill(self,from_date,to_date,product_ids,category_ids,company_ids,fields=False,join_table=False,condition=False,group_by=False,sub_category_ids=False):
         fields = " , 0 as replace"
-        res = super(inheritStockReport, self).salebill(from_date,to_date,product_ids,category_ids,company_ids,fields,join_table,condition,group_by)
+        res = super(inheritStockReport, self).salebill(from_date,to_date,product_ids,category_ids,company_ids,fields=fields,join_table=join_table,condition=condition,group_by=group_by,sub_category_ids=sub_category_ids)
         return res
     
-    def pur_bill_return(self,from_date,to_date,product_ids,category_ids,company_ids,fields=False,join_table=False,condition=False,group_by=False): 
+    def pur_bill_return(self,from_date,to_date,product_ids,category_ids,company_ids,fields=False,join_table=False,condition=False,group_by=False,sub_category_ids=False):
         fields = " , 0 as replace"
-        res = super(inheritStockReport, self).pur_bill_return(from_date,to_date,product_ids,category_ids,company_ids,fields,join_table,condition,group_by)
+        res = super(inheritStockReport, self).pur_bill_return(from_date,to_date,product_ids,category_ids,company_ids,fields=fields,join_table=join_table,condition=condition,group_by=group_by,sub_category_ids=sub_category_ids)
         return res
     
-    def issue(self,from_date,to_date,product_ids,category_ids,company_ids,fields=False,join_table=False,condition=False,group_by=False): 
+    def issue(self,from_date,to_date,product_ids,category_ids,company_ids,fields=False,join_table=False,condition=False,group_by=False,sub_category_ids=False):
         fields = " , 0 as replace"
-        res = super(inheritStockReport, self).issue(from_date,to_date,product_ids,category_ids,company_ids,fields,join_table,condition,group_by)
+        res = super(inheritStockReport, self).issue(from_date,to_date,product_ids,category_ids,company_ids,fields=fields,join_table=join_table,condition=condition,group_by=group_by,sub_category_ids=sub_category_ids)
         return res
     
-    def receive(self,from_date,to_date,product_ids,category_ids,company_ids,fields=False,join_table=False,condition=False,group_by=False): 
+    def receive(self,from_date,to_date,product_ids,category_ids,company_ids,fields=False,join_table=False,condition=False,group_by=False,sub_category_ids=False):
         fields = " , 0 as replace"
-        res = super(inheritStockReport, self).receive(from_date,to_date,product_ids,category_ids,company_ids,fields,join_table,condition,group_by)
+        res = super(inheritStockReport, self).receive(from_date,to_date,product_ids,category_ids,company_ids,fields=fields,join_table=join_table,condition=condition,group_by=group_by,sub_category_ids=sub_category_ids)
         return res
     
-    def pln_receive(self,from_date,to_date,product_ids,category_ids,company_ids,fields=False,join_table=False,condition=False,group_by=False): 
+    def pln_receive(self,from_date,to_date,product_ids,category_ids,company_ids,fields=False,join_table=False,condition=False,group_by=False,sub_category_ids=False):
         fields = " , 0 as replace"
-        res = super(inheritStockReport, self).pln_receive(from_date,to_date,product_ids,category_ids,company_ids,fields,join_table,condition,group_by)
+        res = super(inheritStockReport, self).pln_receive(from_date,to_date,product_ids,category_ids,company_ids,fields=fields,join_table=join_table,condition=condition,group_by=group_by,sub_category_ids=sub_category_ids)
         return res
     
-    def new_product_receive(self,from_date,to_date,product_ids,category_ids,company_ids,fields=False,join_table=False,condition=False,group_by=False): 
+    def new_product_receive(self,from_date,to_date,product_ids,category_ids,company_ids,fields=False,join_table=False,condition=False,group_by=False,sub_category_ids=False):
         fields = " , 0 as replace"
-        res = super(inheritStockReport, self).new_product_receive(from_date,to_date,product_ids,category_ids,company_ids,fields,join_table,condition,group_by)
+        res = super(inheritStockReport, self).new_product_receive(from_date,to_date,product_ids,category_ids,company_ids,fields=fields,join_table=join_table,condition=condition,group_by=group_by,sub_category_ids=sub_category_ids)
         return res
     
-    def inward(self,from_date,to_date,product_ids,category_ids,company_ids,fields=False,join_table=False,condition=False,group_by=False): 
+    def inward(self,from_date,to_date,product_ids,category_ids,company_ids,fields=False,join_table=False,condition=False,group_by=False,sub_category_ids=False):
         fields = " , 0 as replace"
-        res = super(inheritStockReport, self).inward(from_date,to_date,product_ids,category_ids,company_ids,fields,join_table,condition,group_by)
+        res = super(inheritStockReport, self).inward(from_date,to_date,product_ids,category_ids,company_ids,fields=fields,join_table=join_table,condition=condition,group_by=group_by,sub_category_ids=sub_category_ids)
         return res
     
-    def outward(self,from_date,to_date,product_ids,category_ids,company_ids,fields=False,join_table=False,condition=False,group_by=False): 
+    def outward(self,from_date,to_date,product_ids,category_ids,company_ids,fields=False,join_table=False,condition=False,group_by=False,sub_category_ids=False):
         fields = " , 0 as replace"
-        res = super(inheritStockReport, self).outward(from_date,to_date,product_ids,category_ids,company_ids,fields,join_table,condition,group_by)
+        res = super(inheritStockReport, self).outward(from_date,to_date,product_ids,category_ids,company_ids,fields=fields,join_table=join_table,condition=condition,group_by=group_by,sub_category_ids=sub_category_ids)
         return res
     
-    def hop_mill_sent(self,from_date,to_date,product_ids,category_ids,company_ids,fields=False,join_table=False,condition=False,group_by=False): 
+    def hop_mill_sent(self,from_date,to_date,product_ids,category_ids,company_ids,fields=False,join_table=False,condition=False,group_by=False,sub_category_ids=False):
         fields = " , 0 as replace"
-        res = super(inheritStockReport, self).hop_mill_sent(from_date,to_date,product_ids,category_ids,company_ids,fields,join_table,condition,group_by)
+        res = super(inheritStockReport, self).hop_mill_sent(from_date,to_date,product_ids,category_ids,company_ids,fields=fields,join_table=join_table,condition=condition,group_by=group_by,sub_category_ids=sub_category_ids)
         return res
     
-    def hop_mill_receipt(self,from_date,to_date,product_ids,category_ids,company_ids,fields=False,join_table=False,condition=False,group_by=False): 
+    def hop_mill_receipt(self,from_date,to_date,product_ids,category_ids,company_ids,fields=False,join_table=False,condition=False,group_by=False,sub_category_ids=False):
         fields = " , 0 as replace"
-        res = super(inheritStockReport, self).hop_mill_receipt(from_date,to_date,product_ids,category_ids,company_ids,fields,join_table,condition,group_by)
+        res = super(inheritStockReport, self).hop_mill_receipt(from_date,to_date,product_ids,category_ids,company_ids,fields=fields,join_table=join_table,condition=condition,group_by=group_by,sub_category_ids=sub_category_ids)
         return res
    
-    def hop_mill_receipt_finish(self,from_date,to_date,product_ids,category_ids,company_ids,fields=False,join_table=False,condition=False,group_by=False): 
+    def hop_mill_receipt_finish(self,from_date,to_date,product_ids,category_ids,company_ids,fields=False,join_table=False,condition=False,group_by=False,sub_category_ids=False):
         fields = " , 0 as replace"
-        res = super(inheritStockReport, self).hop_mill_receipt_finish(from_date,to_date,product_ids,category_ids,company_ids,fields,join_table,condition,group_by)
+        res = super(inheritStockReport, self).hop_mill_receipt_finish(from_date,to_date,product_ids,category_ids,company_ids,fields=fields,join_table=join_table,condition=condition,group_by=group_by,sub_category_ids=sub_category_ids)
         return res
     
-    def hop_mill_return_grey(self,from_date,to_date,product_ids,category_ids,company_ids,fields=False,join_table=False,condition=False,group_by=False): 
+    def hop_mill_return_grey(self,from_date,to_date,product_ids,category_ids,company_ids,fields=False,join_table=False,condition=False,group_by=False,sub_category_ids=False):
         fields = " , 0 as replace"
-        res = super(inheritStockReport, self).hop_mill_return_grey(from_date,to_date,product_ids,category_ids,company_ids,fields,join_table,condition,group_by)
+        res = super(inheritStockReport, self).hop_mill_return_grey(from_date,to_date,product_ids,category_ids,company_ids,fields=fields,join_table=join_table,condition=condition,group_by=group_by,sub_category_ids=sub_category_ids)
         return res
     
 
-    def hop_greychallan(self,from_date,to_date,product_ids,category_ids,company_ids,fields=False,join_table=False,condition=False,group_by=False): 
+    def hop_greychallan(self,from_date,to_date,product_ids,category_ids,company_ids,fields=False,join_table=False,condition=False,group_by=False,sub_category_ids=False):
         fields = " , 0 as replace"
-        res = super(inheritStockReport, self).hop_mill_return_grey(from_date,to_date,product_ids,category_ids,company_ids,fields,join_table,condition,group_by)
+        res = super(inheritStockReport, self).hop_mill_return_grey(from_date,to_date,product_ids,category_ids,company_ids,fields=fields,join_table=join_table,condition=condition,group_by=group_by,sub_category_ids=sub_category_ids)
         return res
     
-    def hop_greybill_return(self,from_date,to_date,product_ids,category_ids,company_ids,fields=False,join_table=False,condition=False,group_by=False): 
+    def hop_greybill_return(self,from_date,to_date,product_ids,category_ids,company_ids,fields=False,join_table=False,condition=False,group_by=False,sub_category_ids=False):
         fields = " , 0 as replace"
-        res = super(inheritStockReport, self).hop_greybill_return(from_date,to_date,product_ids,category_ids,company_ids,fields,join_table,condition,group_by)
+        res = super(inheritStockReport, self).hop_greybill_return(from_date,to_date,product_ids,category_ids,company_ids,fields=fields,join_table=join_table,condition=condition,group_by=group_by,sub_category_ids=sub_category_ids)
         return res
     
-    def hop_grey_sale_challan(self,from_date,to_date,product_ids,category_ids,company_ids,fields=False,join_table=False,condition=False,group_by=False): 
+    def hop_grey_sale_challan(self,from_date,to_date,product_ids,category_ids,company_ids,fields=False,join_table=False,condition=False,group_by=False,sub_category_ids=False):
         fields = " , 0 as replace"
-        res = super(inheritStockReport, self).hop_grey_sale_challan(from_date,to_date,product_ids,category_ids,company_ids,fields,join_table,condition,group_by)
+        res = super(inheritStockReport, self).hop_grey_sale_challan(from_date,to_date,product_ids,category_ids,company_ids,fields=fields,join_table=join_table,condition=condition,group_by=group_by,sub_category_ids=sub_category_ids)
         return res
     
-    def hop_grey_salebill_return(self,from_date,to_date,product_ids,category_ids,company_ids,fields=False,join_table=False,condition=False,group_by=False): 
+    def hop_grey_salebill_return(self,from_date,to_date,product_ids,category_ids,company_ids,fields=False,join_table=False,condition=False,group_by=False,sub_category_ids=False):
         fields = " , 0 as replace"
-        res = super(inheritStockReport, self).hop_grey_salebill_return(from_date,to_date,product_ids,category_ids,company_ids,fields,join_table,condition,group_by)
+        res = super(inheritStockReport, self).hop_grey_salebill_return(from_date,to_date,product_ids,category_ids,company_ids,fields=fields,join_table=join_table,condition=condition,group_by=group_by,sub_category_ids=sub_category_ids)
         return res
 
-    def hop_manufacturing(self,from_date,to_date,product_ids,category_ids,company_ids,fields=False,join_table=False,condition=False,group_by=False): 
+    def hop_manufacturing(self,from_date,to_date,product_ids,category_ids,company_ids,fields=False,join_table=False,condition=False,group_by=False,sub_category_ids=False):
         fields = " , 0 as replace"
-        res = super(inheritStockReport, self).hop_manufacturing(from_date,to_date,product_ids,category_ids,company_ids,fields,join_table,condition,group_by)
+        res = super(inheritStockReport, self).hop_manufacturing(from_date,to_date,product_ids,category_ids,company_ids,fields=fields,join_table=join_table,condition=condition,group_by=group_by,sub_category_ids=sub_category_ids)
         return res
 
 
-    def hop_manufacturing_line(self,from_date,to_date,product_ids,category_ids,company_ids,fields=False,join_table=False,condition=False,group_by=False): 
+    def hop_manufacturing_line(self,from_date,to_date,product_ids,category_ids,company_ids,fields=False,join_table=False,condition=False,group_by=False,sub_category_ids=False):
         fields = " , 0 as replace"
-        res = super(inheritStockReport, self).hop_manufacturing_line(from_date,to_date,product_ids,category_ids,company_ids,fields,join_table,condition,group_by)
+        res = super(inheritStockReport, self).hop_manufacturing_line(from_date,to_date,product_ids,category_ids,company_ids,fields=fields,join_table=join_table,condition=condition,group_by=group_by,sub_category_ids=sub_category_ids)
         return res
     
-    def replace_battery(self,from_date,to_date,product_ids,category_ids,company_ids,fields=False,join_table=False,condition=False,group_by=False): 
+    def replace_battery(self,from_date,to_date,product_ids,category_ids,company_ids,fields=False,join_table=False,condition=False,group_by=False,sub_category_ids=False):
 
         query = """  select COALESCE(c.name,'') as itemname , COALESCE(d.name,'') as category , 0 as op_pcs , 0 as op_meter , 0 as op_weight , 
                    0 as pur_pcs ,0 as pur_meter , 0 as pur_weight , 
@@ -150,7 +150,7 @@ class inheritStockReport(models.Model):
                 0 as gr_rt_mill_taka,0 as gr_rt_mill_meter,
                 0 as manufacturing_qty,0 as manufacturing_line_qty,
                 'replace' as module ,-1 * COALESCE(sum(b.qty),0) as pcs , 0  as meter , 0 as weight ,
-                f.name as serial , a.party_id as party_id, b.date as date, b.product_id,COALESCE(sum(b.qty),0) as replace
+                f.name as serial , a.party_id as party_id, b.date as date, b.product_id,0 as rate,COALESCE(sum(b.qty),0) as replace
                     """
         if fields :
             query += fields
@@ -183,16 +183,66 @@ class inheritStockReport(models.Model):
              query += group_by
         return query
     
+    def opening_purchasebill(self,from_date,to_date,product_ids,category_ids,company_ids,fields=False,join_table=False,condition=False,group_by=False,sub_category_ids=False):
+        query = """ select COALESCE(c.name,'') as itemname , COALESCE(d.name,'') as category , -1 *  COALESCE(sum(b.pcs),0)  as op_pcs , -1 * COALESCE(sum(b.meter),0)  as op_meter , -1 * COALESCE(sum(b.weight),0) as op_weight , 
+                   0 as pur_pcs ,0 as pur_meter , 0  as pur_weight , 
+                    0 as sale_ret_pcs , 0 as sale_ret_meter , 0 as sale_ret_weight , 
+                    0 as sale_order_pcs , 0 as sale_order_meter , 0 as sale_order_weight , 
+                    0 as pur_ret_pcs , 0 as pur_ret_meter , 0 as pur_ret_weight , 
+                    0 as job_issue_pcs , 0 as job_issue_meter , 0 as job_issue_weight , 
+                    0 as job_receive_pcs , 0 as job_receive_meter , 0 as job_receive_weight ,
+                    0 as inward_pcs ,0 as inward_meter ,
+                    0 as outward_pcs , 0 as outward_meter , COALESCE(sum(c.minimum_qty),0) as minimum_qty  ,e.name as unit  
+                      ,0 as grey_chln_taka,0 as grey_return_taka ,0 as sale_taka,0  as sale_return_taka,
+                0 as grey_chln_meter,0 as grey_return_meter ,0 as sale_meter,0  as sale_return_meter ,
+                0 as mill_sent_taka ,0 as mill_sent_meter,
+                0 as  mill_rec_taka , 0 as mill_rec_meter,
+                0 as gr_rt_mill_taka,0 as gr_rt_mill_meter,
+                0 as manufacturing_qty,0 as manufacturing_line_qty,
+                'purchase_order' as module ,  -1 *  COALESCE(sum(b.pcs),0) as pcs , -1 *   COALESCE(sum(b.meter),0)  as meter , -1 *   COALESCE(sum(b.weight),0) as weight,
+                a.name as serial , a.party_id as party_id, a.date as date , b.product_id ,b.rate as rate, 0  as replace"""
+        if fields :
+            query += fields
+        query += """  from hop_purchasebill as a 
+                    inner join hop_purchasebill_line as b on a.id = b.mst_id 
+                    left join hop_product_mst as c on c.id =  b.product_id
+                    left join hop_category_mst as d on d.id = c.category_id
+                    left join hop_unit_mst as e on e.id = c.unit_id """
+        if join_table:
+            query += join_table
 
-    def stock_report_query(self,from_date,to_date,product_ids,category_ids,company_ids):
+        query += """ where 1=1 and a.is_opening_strock = 't' """ 
+        
+        query += " and a.date <=  '"+ str(to_date) +"'"
+        query += " and a.date >=  '"+ str(from_date) +"'"
+        query += ' and a.company_id in ' + tuple_return(company_ids.ids)
+        if product_ids:     
+            query += ' and b.product_id in ' + tuple_return(product_ids.ids)
+        if category_ids: 
+            query += ' and c.category_id in ' + tuple_return(category_ids.ids) 
+        
+        if condition:
+            query += condition
+            
+            
+        query += ' group by '
+        query += """  c.name , d.name ,e.name,a.name,a.party_id,a.date , b.product_id,b.rate"""
+        if group_by:
+             query += group_by
+        return query
+    
+
+    def stock_report_query(self,from_date,to_date,product_ids,category_ids,company_ids,sub_category_ids=False):
 
         query = super(inheritStockReport, self).stock_report_query(from_date,to_date,product_ids,category_ids,company_ids)
         query +=" union all "
-        query += self.replace_battery(from_date,to_date,product_ids,category_ids,company_ids,fields=False,join_table=False,condition=False,group_by=False)            
+        query += self.replace_battery(from_date,to_date,product_ids,category_ids,company_ids,fields=False,join_table=False,condition=False,group_by=False)  
+        query +=" union all "
+        query += self.opening_purchasebill(from_date,to_date,product_ids,category_ids,company_ids,fields=False,join_table=False,condition=False,group_by=False)          
         return query
     
-    def stock_report(self,from_date,to_date,product_ids,category_ids,stock_status,stock_wise,company_ids,fields=False,bal_pcs_fields = False,bal_meter_fields = False,bal_weight_fields=False,group_by=False):
-        query = self.stock_report_query(from_date,to_date,product_ids,category_ids,company_ids)
+    def stock_report(self,from_date,to_date,product_ids,category_ids,stock_status,stock_wise,company_ids,fields=False,bal_pcs_fields = False,bal_meter_fields = False,bal_weight_fields=False,group_by=False,sub_category_ids=False):
+        query = self.stock_report_query(from_date,to_date,product_ids,category_ids,company_ids,sub_category_ids=sub_category_ids)
         allQuery = """ select x.product_id ,x.itemname  , x.category  ,
                 sum(x.op_pcs) as op_pcs  , sum(x.op_meter) as op_meter , sum(x.op_weight) as op_weight , 
                 sum(x.pur_pcs) as pur_pcs ,sum(x.pur_meter) as pur_meter , sum(x.pur_weight) as pur_weight , 

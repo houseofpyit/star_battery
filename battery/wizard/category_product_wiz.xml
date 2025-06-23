@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+<!-- tree view-->
+    <record id="hop_category_product_wiz" model="ir.ui.view">
+        <field name="name">category_product_wiz</field>
+        <field name="model">category.product.wiz</field>
+        <field name="arch" type="xml">
+            <tree string="Category Wise Product"  create="0" >
+                <header>
+                    <button string="Save" name="action_save_product" type="object" class="btn btn-primary o_form_button_save"/>
+                </header>
+                <field name="product_id" />
+                <field name="res_partner_id" invisible="1"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="category_product_wiz_filter" model="ir.ui.view">
+        <field name="name">category.product.wiz.search</field>
+        <field name="model">category.product.wiz</field>
+        <field name="arch" type="xml">
+            <search string="Search Fatch Product">
+                <field name="product_id" string="Product" filter_domain="[('product_id.name', 'ilike', self)]"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_category_product_wiz" model="ir.actions.act_window">
+        <field name="name">Category Wise Product</field>
+        <field name="res_model">category.product.wiz</field>
+        <field name="view_mode">tree,form</field>
+         <field name="target">new</field>
+    </record>
+
+</odoo>

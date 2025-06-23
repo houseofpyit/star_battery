@@ -1,0 +1,299 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <template id="transaction.report_purc_bill_detail">
+            <t t-call="web.html_container">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <style>
+                            .ser_font{
+                                font-size:30px;
+                                font-family: "Times New Roman" !important;
+                            }
+
+                        </style>
+                        <t t-foreach="docs" t-as="o">
+                            <!-- <table width="100%" style="" v-align="top">
+                                <tr>
+                                    <td colspan="2" style="text-align: center; top-margin:35px;height:50px;font-family:serif;">
+                                        <h1 class="ser_font"><b><span t-esc="o.company_id.name"/></b></h1>
+                                    </td>
+                                </tr>    
+                                <tr>
+                                    <td colspan="2" style="text-align: center;">
+                                        <span  t-esc="o.company_id.street"/>,<span  t-esc="o.company_id.street2"/>,<span  t-esc="o.company_id.city"/><span  t-esc="o.company_id.state_id.name"/><span  t-esc="o.company_id.country_id.name"/><span  t-esc="o.company_id.zip"/>
+                                        
+                                    </td>
+                                </tr>  
+                                <tr>
+                                    <td style="text-align: center; ">
+                                        <b><span>Phone No:</span>
+                                        <span  t-esc="o.company_id.phone"/></b>
+                                    </td>
+                                </tr>
+                            </table> -->
+                            <hr style="border-top: 2px solid black;"></hr>
+                            <table  width="100%">
+                                <div class="oe_structure"/>
+                                <tr>
+                                    <td>
+                                        <center><h3 style="font-weight:10px;">PURCHASE BILL</h3></center>
+                                    </td>
+                                </tr>
+                            </table>
+                            <hr style="border-top: 2px solid black;"></hr>
+                            <!-- <table  width="100%">
+                                <tr>
+                                    <td style="text-align: left; ">
+                                        <b><span>Email :</span>
+                                        <span  t-esc="o.company_id.email"/></b>
+                                    </td>
+                                    <td style="text-align: right; ">
+                                        <b><span>GSTIN:</span>
+                                        <span  t-esc="o.company_id.gstno"/></b>
+                                    </td>
+                                </tr>    
+                            </table>   -->
+                            <table width="100%">
+                                <tr>
+                                    <td style="text-align: left;width:70%;">
+                                        <b style='padding-bottom:10px; '>Party : <span  t-esc="o.party_id.name"/></b><br/>
+                                        <b style='padding-bottom:10px;'><span>Addres : </span></b><span  t-esc="o.party_id.addr1"/><br/>
+                                        <span  t-esc="o.party_id.addr2"/><br/>
+                                        <span  t-esc="o.party_id.city_id.name"/>
+                                        <span  t-esc="o.party_id.state_id.name"/>
+                                        <span  t-esc="o.party_id.pincode"/><br/>
+                                        <b>GST No : <span  t-esc="o.party_id.gstno"/></b><br/>
+                                        <b><span>State : </span></b><span  t-esc="o.party_id.state_id.name"/><br/>
+                                    </td>
+                                    <td style="text-align: left;width:40%;">
+                                        <b><span>Bill No : </span></b><span  t-esc="o.name"/><br/>
+                                        <b><span>Date : </span></b><span  t-esc="o.date.strftime('%d/%m/%Y')"/><br/>
+                                        <b><span>Pty ord No : </span></b><span  t-esc="o.bill_number"/><br/>
+                                    </td>
+                                </tr>
+                            </table>
+                            <table width="100%">
+                                <tr>
+                                    <th style="background-color: #ebebe0;text-align:center;">SRL</th>
+                                    <th style="background-color: #ebebe0;text-align:center;">ITEM NAME</th>
+                                    <th style="background-color: #ebebe0;text-align:center;">Barcode</th>
+                                    <th style="background-color: #ebebe0;text-align:center;">HSNCode</th>
+                                    <th style="background-color: #ebebe0;text-align:center;">PCS</th>
+                                    <!-- <th style="background-color: #ebebe0;text-align:center;">CUT</th> -->
+                                    <th style="background-color: #ebebe0;text-align:center;">METERS</th>
+                                    <th style="background-color: #ebebe0;text-align:center;">RATE</th>
+                                    <th style="background-color: #ebebe0;text-align:center;">AMOUNT</th>
+                                </tr>
+                                <t t-set="srl" t-value="0" />
+                                <t t-set="tot_pcs" t-value="0" />
+                                <t t-set="tot_meter" t-value="0" />
+                                <t t-set="tot_final_amt" t-value="0" />
+                                
+                                <t t-foreach="o.line_id" t-as="item">
+                                    <t t-set="srl" t-value="srl + 1" />
+                                    <t t-set="tot_pcs" t-value="tot_pcs + item.pcs" />
+                                    <t t-set="tot_meter" t-value="tot_meter + item.meter" />
+                                    <t t-set="tot_final_amt" t-value="tot_final_amt + item.final_amt" />
+                                    <tr>
+                                        <td style="text-align: center;">
+                                            <span><span t-esc="srl"></span></span>
+                                        </td>
+                                        <td style="text-align: left;">
+                                            <span><span t-esc="item.product_id.name"></span></span>
+                                        </td>
+                                        <td style="text-align: center;">
+                                            <span t-esc="', '.join([barcode.name for barcode in item.barcode_line_id])"/>
+                                        </td>
+
+                                        <td style="text-align: right;">
+                                            <span ><span t-esc="item.hsn_id.name"></span></span>
+                                        </td>
+                                        <td style="text-align: right;">
+                                            <span ><span t-esc="item.pcs"></span></span>
+                                        </td>
+                                        <!-- <td style="text-align: right;">
+                                            <span ><span t-esc="item.cut"></span></span>
+                                        </td> -->
+                                        <td style="text-align: right;">
+                                            <span ><span t-esc="'%.2f'% (item.meter)"></span></span>
+                                        </td>
+                                        <td style="text-align: right;">
+                                            <span ><span t-esc="'%.2f'% (item.rate)"></span></span>
+                                        </td>
+                                        <td style="text-align: right;">
+                                            <span ><span t-esc="'%.2f'% (item.amount)"></span></span>
+                                        </td>
+                                    </tr>
+                                </t>
+                                <t t-foreach="range(5-srl)" t-as="l">
+                                    <tr>
+                                        <td style="padding-left:3px;border-left:0px;border-bottom:none;border-top:none;">
+                                            <br></br>
+                                        </td>
+                                        <td style="padding-left:3px;border-bottom:none;border-top:none;">
+                                            <br></br>
+                                        </td>
+                                        <td style="padding-left:3px;border-bottom:none;border-top:none;">
+                                            <br></br>
+                                        </td>
+                                        <td style="padding-left:3px;border-bottom:none;border-top:none;">
+                                            <br></br>
+                                        </td>
+                                        <td style="padding-left:3px;text-align:right;border-bottom:none;border-top:none;">
+                                            <br></br>
+                                        </td>
+                                        <!-- <td style="padding-left:3px;text-align:right;border-bottom:none;border-top:none;">
+                                            <br></br>
+                                        </td> -->
+                                        <td style="padding-left:3px;text-align:right;border-bottom:none;border-top:none;">
+                                            <br></br>
+                                        </td>
+                                        <td style="padding-left:3px;text-align:right;border-bottom:none;border-top:none;">
+                                            <br></br>
+                                        </td>
+                                        <td style="padding-left:3px;border-bottom:none;border-top:none;">
+                                            <br></br>
+                                        </td>
+                                    </tr>
+                                </t>
+                                <tr style="border:1px solid black;border-left:none;border-right:none;">
+                                    <td style="border:1px solid black;border-left:none;border-right:none;"></td>
+                                    <td style="border:1px solid black;border-left:none;border-right:none;"></td>
+                                    <td style="border:1px solid black;border-left:none;border-right:none;"></td>
+                                    
+                                    <td style="border:1px solid black;border-left:none;border-right:none;"></td>
+                                    <td style="border:1px solid black;border-left:none;border-right:none;text-align:right;">
+                                        <t t-esc="'%.2f'% (tot_pcs)" />
+                                    </td>
+                                    
+                                    <!-- <td style="border:1px solid black;border-left:none;border-right:none;"></td> -->
+                                    <td style="border:1px solid black;border-left:none;border-right:none;text-align:right;">
+                                        <t t-esc="'%.2f'% (tot_meter)" />
+                                    </td>
+                                    <td style="border:1px solid black;border-left:none;border-right:none;"></td>
+                                    <td style="border:1px solid black;border-left:none;border-right:none;text-align:right;">
+                                        <t t-esc="'%.2f'% (tot_final_amt)" />
+                                    </td>
+                                </tr>
+                            </table>
+                            <br/>
+                            <table style="width:100%;border:none;">
+                                <tr style="background-color:#F4F0E0;">
+                                    <td style="width:30%;text-align: left;">
+                                        <br/><span><b>Amount (In Words) : </b></span><span style="font-weight:bold;" t-esc="o.amount_to_text((o.net_amt), 'INR')"/><b><span style="font-weight:bold;"  /> PAISA ONLY</b>
+                                    </td>
+                                </tr>
+                            </table>
+                            <br />
+                            <table width="100%">
+                                <tr>
+                                    <td style="text-align: left;" width="70%">
+                                    <table>
+                                        <tr>
+                                            <td>
+                                                <b><span>Remarks : </span></b><span  t-esc="o.remarks"/><br/>
+                                                <b><span>Bank Name: </span></b><span  t-esc="o.party_id.bank_name"/><br/>
+                                                <b><span>Account No: </span></b><span  t-esc="o.party_id.acc_no"/><br/>
+                                                <b><span>IFSC : </span></b><br/>
+                                                <span>1. Payment to be made by payee A/c Cheque or Draft.</span><br/> 
+                                                <span>2. Any complain for goods should be made within 7 days,</span><br/>
+                                                <span>after that no complains will be entertained.</span><br/>
+                                                <span>3. Interest @24% per annum will be charged after due date of the bill.</span><br/>
+                                                <span>4. We are not responsible for the loss or damage during tranit.</span><br/>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                    </td>
+                                    
+                                    <td style="text-align: right;" width="30%">
+                                        <table width="100%">
+                                            <tr>
+                                                <td width="60%">
+                                                    <b>Discount </b>
+                                                </td>
+                                                <td  style="text-align:right;">
+                                                    <span  t-esc="o.tot_disc_amt"/><br/>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td >
+                                                    <b>Taxable Value </b>
+                                                </td>
+                                                <td style="text-align:right;">
+                                                    <span  t-esc="o.tot_taxable"/><br/>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    <b>CGST </b>
+                                                </td>
+                                                <td style="text-align:right;">
+                                                    <span  t-esc="o.tot_cgst"/><br/>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    <b>SGST </b>
+                                                </td>
+                                                <td style="text-align:right;">
+                                                    <span  t-esc="o.tot_sgst"/><br/>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    <b>IGST </b>
+                                                </td>
+                                                <td style="text-align:right;">
+                                                    <span  t-esc="o.tot_igst"/><br/>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td  style="border-top:1px solid black;">
+                                                    <b>Net Amount </b>
+                                                </td>
+                                                <td style="text-align:right;border-top:1px solid black;">
+                                                    <span  t-esc="o.net_amt"/><br/>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                    <!-- </td> -->
+                                </tr>
+                            </table>
+                            <table width="100%">
+                                <tr style="text-align:right;">
+                                    <td>
+                                        For,
+                                        <b><span  t-esc="o.company_id.name"/></b><br/>
+                                    </td>
+                                </tr>
+                                <tr><td><br/><br/></td></tr>
+                                <tr>
+                                    <td style="text-align:right;">
+                                        <b>Authorised Sign</b>
+                                    </td>
+                                </tr>
+                            </table>
+                            <p style="page-break-before:always;"> </p>
+                            <div class="footer">
+                                <div class="col-xs-3" style="width: 100%; margin: 0 auto;border-top: 1px solid black">
+                                    <table style="width:100%;">
+                                        <tr>
+                                            <td style="text-align: right;padding-top:0px;">
+                                                <span>  Page</span>
+                                                <span class="page" />
+                                                of
+                                                <span class="topage" />
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                        </t>
+                    </div>
+                </t>
+            </t>
+        </template>
+    </data>
+</odoo>

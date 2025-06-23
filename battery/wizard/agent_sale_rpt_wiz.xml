@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="agent_sale_wizard_view_form" model="ir.ui.view">
+        <field name="name">Agent Sale Report</field>
+        <field name="model">agent.sale.rpt.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Sale Bill Concise Report">
+                <sheet>
+                    <group>
+                        <group>     
+                            <field name="from_date" default_focus="1"/>
+                            <field name="type" required="1"/>                   
+                            <field name="agent_ids" widget="many2many_tags" options="{'no_create':True}"/>
+                            <field name="product_ids" widget="many2many_tags" options="{'no_create':True}" attrs="{'invisible': [('type', '=','Party Collection')]}" />
+                            <field name="party_ids" widget="many2many_tags" options="{'no_create':True}" attrs="{'invisible': [('type', '=','Product')]}" />
+                        </group>
+                        <group> 
+                            <field name="to_date" />
+                           
+                            <field name="company_id" options="{'no_create':True}" invisible="1"/>
+                        </group>
+                    </group>
+                </sheet>
+                <footer>
+                    <button name="get_agent_sale_rpt" type="object" string="Generate" class="oe_highlight" />
+                    <button string="Cancel" class="btn btn-secondary" special="cancel" />
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_agent_sale_report_wizard" model="ir.actions.act_window">
+        <field name="name">Agent Sale</field>
+        <field name="res_model">agent.sale.rpt.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <menuitem
+        id="agent_sale_report"
+        name="Agent Sale"
+        parent="menu_hop_agent_sale_main"
+        action="action_agent_sale_report_wizard"
+        sequence="1"/>
+
+</odoo>

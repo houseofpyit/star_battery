@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="barcode_salebillreturn_form" model="ir.ui.view">
+        <field name="name">Sale Bill</field>
+        <field name="model">hop.salebillreturn</field>
+        <field name="inherit_id" ref="transaction.salebillreturn_form" />
+        <field name="arch" type="xml">
+
+            <xpath expr="//tree/field[@name='hsn_id']" position="after">
+                <field name="barcode_ids" width="20%" widget="many2many_tags" />
+            </xpath>
+            <xpath expr="//tree/field[@name='disc_per']" position="attributes">
+                <attribute name="optional">hide</attribute>
+            </xpath>
+
+            <xpath expr="//tree/field[@name='gst_ids']" position="attributes">
+                <attribute name="optional">hide</attribute>
+            </xpath>
+
+            <xpath expr="//tree/field[@name='hsn_id']" position="attributes">
+                <attribute name="optional">hide</attribute>
+            </xpath>
+
+            <xpath expr="//tree/field[@name='unit_id']" position="attributes">
+                <attribute name="optional">hide</attribute>
+            </xpath>
+            <xpath expr="//tree/field[@name='disc_amt']" position="attributes">
+                <attribute name="optional">hide</attribute>
+            </xpath>
+            <xpath expr="//tree/field[@name='add_amt']" position="attributes">
+                <attribute name="optional">hide</attribute>
+            </xpath>
+        </field>
+    </record>
+
+
+    <record id="inherit_hop_fatch_salebill_record" model="ir.ui.view">
+        <field name="name">hop_fatch_salebill_record</field>
+        <field name="model">hop.fatch.salebill.record</field>
+        <field name="inherit_id" ref="transaction.hop_fatch_salebill_record" />
+        <field name="arch" type="xml">
+
+            <xpath expr="//field[@name='product_id']" position="after">
+                <field name="barcode_ids" width="20%" widget="many2many_tags" />
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

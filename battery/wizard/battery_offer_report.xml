@@ -32,7 +32,7 @@
     </record>
 
 
-    <menuitem id="menu_hop_battery_offer_report" name="Generate Offer Report"
+    <menuitem id="menu_hop_battery_offer_report" name="Offer Report"
               parent="battery.menu_hop_battery_offer_root"
               action="action_hop_battery_offer_report_wizard"/>
 </odoo>

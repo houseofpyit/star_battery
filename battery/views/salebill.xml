@@ -8,14 +8,101 @@
             <field name="model">hop.salebill</field>
             <field name="inherit_id" ref="transaction.salebill_form"/>
             <field name="arch" type="xml">
+            <xpath expr="//tree/field[@name='unit_id']"  position="attributes">
+               <attribute name="optional">hide</attribute>
+            </xpath>
+            <xpath expr="//field[@name='vehical_no']" position="after">
+                <span class="o_form_label o_td_label" name="cash_acc_id" >
+                    <b>Cash A/C</b>
+                </span>
+                <div class="o_address_format">
+                    <field name="payment_acc_id" class="o_address_city" style="width:50%;" force_save="1" attrs="{'required': [('payment_amt', '!=', 0)]}" options="{'no_create': True}"/>
+                    <field name="payment_amt" class="o_address_city" style="width:40%;" readonly="0" force_save="1"/>
+                </div>
+                <span class="o_form_label o_td_label" name="bank_acc_id">
+                    <b>Bank A/C</b>
+                </span>
+                <div class="o_address_format">
+                    <field name="bank_acc_id" class="o_address_city" style="width:50%;" force_save="1" attrs="{'required': [('bank_amt', '!=', 0)]}" options="{'no_create': True}"/>
+                    <field name="bank_amt" class="o_address_city" style="width:40%;" readonly="0" force_save="1"/>
+                </div>
+            </xpath>
                 <xpath expr="//tree/field[@name='product_id']" position="after">
-                    <field name="barcode_id" domain="[('product_id', '=', product_id)]" />
-                    <field name="total_sale" />
+                    <field name="barcode_ids" width="20%" widget="many2many_tags"  domain="[('product_id', '=', product_id),('stage', '=', 'new')]" />
+                    <field name="warranty" />
+                    <field name="warranty_end_date" />
+                    <field name="total_sale" optional="hide" />
                 </xpath>
+             <xpath expr="//tree/field[@name='disc_per']" position="attributes">
+               <attribute name="optional">hide</attribute>
+            </xpath>
 
+             <xpath expr="//tree/field[@name='gst_ids']" position="attributes">
+               <attribute name="optional">hide</attribute>
+            </xpath>
+
+            <xpath expr="//tree/field[@name='hsn_id']" position="attributes">
+               <attribute name="optional">hide</attribute>
+            </xpath>
+
+
+            <xpath expr="//tree/field[@name='disc_amt']" position="attributes">
+               <attribute name="optional">hide</attribute>
+            </xpath>
+            <xpath expr="//tree/field[@name='add_amt']" position="attributes">
+               <attribute name="optional">hide</attribute>
+            </xpath>
                   <xpath expr="//tree/field[@name='final_amt']" position="after">
                     <field name="offer_status" decoration-success="offer_status != ''"  />
                 </xpath>
+            <xpath expr="//field[@name='due_days']" position="after">
+                <field name="due_date" readonly="1" force_save="1"/> 
+                <!-- <button name="update_due_date" type="object" string="update" invisible="1"/> -->
+            </xpath>
+            </field>
+        </record>
+
+        <record id="salebill_tree_inherited" model="ir.ui.view">
+            <field name="name">Sale bill Inharit</field>
+            <field name="model">hop.salebill</field>
+            <field name="inherit_id" ref="transaction.salebill_tree"/>
+            <field name="arch" type="xml">
+            <xpath expr="//tree/field[@name='party_id']"  position="after">
+                <field name="mobile_no" />
+                <field name="city_id" />
+            </xpath>
+            <xpath expr="//tree/field[@name='due_days']"  position="after">
+                <field name="due_date" optional="hide"/>
+            </xpath>
+            </field>
+        </record>
+
+        <record id="hop_financial_year_view_form_inherited" model="ir.ui.view">
+            <field name="name">hop.financial.year.view.form.inherit</field>
+            <field name="model">hop.financial.year</field>
+            <field name="inherit_id" ref="master.hop_financial_year_view_form"/>
+            <field name="arch" type="xml">
+            <xpath expr="//group[@name='financial']"  position="after">
+                <notebook >
+                    <page string="Transfer">
+                        <field name="line_ids" >
+                            <tree editable="bottom" create="1" delete="0" edit="1">
+                                <field name="select" force_save="1"/>
+                                <field name="name" readonly="1" force_save="1" />
+                                <field name="stage" readonly="1" force_save="1"/>
+                            </tree>
+                        </field>
+                    </page>
+                </notebook>  
+                <group >
+                    <group>
+                        <button name='transfer' string='Transfer' type='object' class='oe_highlight oe_edit_only'/>
+                    </group> 
+                    <group>
+                        <button name='transfer_update_line' string='Transfer Record Update' type='object' class='oe_highlight oe_edit_only'/>
+                    </group>
+                </group>
+            </xpath>
             </field>
         </record>
     </data>

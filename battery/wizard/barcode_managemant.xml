@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="barcode_managemant_wizard_view_form" model="ir.ui.view">
+        <field name="name">Barcode Managemant Report</field>
+        <field name="model">barcode.managemant.rpt.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Sale Bill Concise Report">
+                <sheet>
+                    <group>
+                        <group>                        
+                            <field name="from_date" default_focus="1"/>
+                            <field name="product_id" widget="many2many_tags" options="{'no_create':True}"/>
+                        </group>
+                        <group> 
+                            <field name="to_date" />
+                            <field name="stage" />
+                        </group>
+                    </group>
+                </sheet>
+                <footer>
+                    <button name="get_barcode_rpt" type="object" string="Generate" class="oe_highlight" />
+                    <button string="Cancel" class="btn btn-secondary" special="cancel" />
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_barcode_managemant_report_wizard" model="ir.actions.act_window">
+        <field name="name">Barcode Managemant</field>
+        <field name="res_model">barcode.managemant.rpt.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <menuitem
+        id="barcode_managemant_report"
+        name="Barcode Managemant"
+        parent="dynamic_report.purchase_report"
+        action="action_barcode_managemant_report_wizard"
+        sequence="3"/>
+
+</odoo>

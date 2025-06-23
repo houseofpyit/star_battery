@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record model="hop.ledger.field" id="receipt1retail1">
+        <field name="table_name">hop_salebill</field>
+        <field name="serial">bill_no</field>
+        <field name="srchr">bill_chr</field>
+        <field name="bill_no">bill_no</field>
+        <field name="date">date</field>
+        <field name="ref_ac_id">party_id</field>
+        <field name="ac_id">payment_acc_id</field>
+        <field name="remarks">concat('Retail Sale Cash Receipt')</field>
+        <field name="dr_amt">payment_amt</field>
+        <field name="cr_amt">0</field>
+        <field name="code">RS</field>
+        <field name="control_id">id</field>
+        <field name="cgst_id"></field>
+        <field name="sgst_id"></field>
+        <field name="igst_id"></field>
+        <field name="ugst_id"></field>
+        <field name="cess_id"></field>
+        <field name="round_off_id"></field>
+        <field name="doc_no">bill_no</field>
+        <field name="cheque"></field>
+        <field name="cheque_date"></field>
+        <field name="clearing_date"></field>
+        <field name="cond"></field>
+        <field name="active">True</field>
+    </record>
+
+    <record model="hop.ledger.field" id="receipt2retail2">
+        <field name="table_name">hop_salebill</field>
+        <field name="serial">bill_no</field>
+        <field name="srchr">bill_chr</field>
+        <field name="bill_no">bill_no</field>
+        <field name="date">date</field>
+        <field name="ref_ac_id">payment_acc_id</field>
+        <field name="ac_id">party_id</field>
+        <field name="remarks">concat('Retail Sale Cash Receipt')</field>
+        <field name="dr_amt">0</field>
+        <field name="cr_amt">payment_amt</field>
+        <field name="code">RS</field>
+        <field name="control_id">id</field>
+        <field name="cgst_id"></field>
+        <field name="sgst_id"></field>
+        <field name="igst_id"></field>
+        <field name="ugst_id"></field>
+        <field name="cess_id"></field>
+        <field name="round_off_id"></field>
+        <field name="doc_no">bill_no</field>
+        <field name="cheque"></field>
+        <field name="cheque_date"></field>
+        <field name="clearing_date"></field>
+        <field name="cond"></field>
+        <field name="active">True</field>
+    </record>
+
+    <!-- Bank Posting -->
+    <record model="hop.ledger.field" id="receipt1retail3">
+        <field name="table_name">hop_salebill</field>
+        <field name="serial">bill_no</field>
+        <field name="srchr">bill_chr</field>
+        <field name="bill_no">bill_no</field>
+        <field name="date">date</field>
+        <field name="ref_ac_id">party_id</field>
+        <field name="ac_id">bank_acc_id</field>
+        <field name="remarks">concat('Retail Sale Bank Receipt')</field>
+        <field name="dr_amt">bank_amt</field>
+        <field name="cr_amt">0</field>
+        <field name="code">RS</field>
+        <field name="control_id">id</field>
+        <field name="cgst_id"></field>
+        <field name="sgst_id"></field>
+        <field name="igst_id"></field>
+        <field name="ugst_id"></field>
+        <field name="cess_id"></field>
+        <field name="round_off_id"></field>
+        <field name="doc_no">bill_no</field>
+        <field name="cheque"></field>
+        <field name="cheque_date"></field>
+        <field name="clearing_date"></field>
+        <field name="cond"></field>
+        <field name="active">True</field>
+    </record>
+
+    <record model="hop.ledger.field" id="receipt2retail4">
+        <field name="table_name">hop_salebill</field>
+        <field name="serial">bill_no</field>
+        <field name="srchr">bill_chr</field>
+        <field name="bill_no">bill_no</field>
+        <field name="date">date</field>
+        <field name="ref_ac_id">bank_acc_id</field>
+        <field name="ac_id">party_id</field>
+        <field name="remarks">concat('Retail Sale Bank Receipt')</field>
+        <field name="dr_amt">0</field>
+        <field name="cr_amt">bank_amt</field>
+        <field name="code">RS</field>
+        <field name="control_id">id</field>
+        <field name="cgst_id"></field>
+        <field name="sgst_id"></field>
+        <field name="igst_id"></field>
+        <field name="ugst_id"></field>
+        <field name="cess_id"></field>
+        <field name="round_off_id"></field>
+        <field name="doc_no">bill_no</field>
+        <field name="cheque"></field>
+        <field name="cheque_date"></field>
+        <field name="clearing_date"></field>
+        <field name="cond"></field>
+        <field name="active">True</field>
+    </record>
+</odoo>
