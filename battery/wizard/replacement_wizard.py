@@ -50,9 +50,7 @@ class ReplacementBatteryWizard(models.TransientModel):
                         raise ValidationError('No Barcode Found !!!')
             sale_barcode =  False
             product_id = False
-            print("************************",self.barcode_id.is_manual)
             if not self.barcode_id.is_manual :
-                print("**********",replacement_again_replace,replacement,replacement_line_record)
                 if not  replacement_again_replace:
                     if replacement or sale or  replacement_line_record:
                         if replacement:
