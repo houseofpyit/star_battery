@@ -1,6 +1,7 @@
-from odoo import models ,fields, api,_
+from odoo import models ,fields, api
 from odoo.exceptions import UserError, ValidationError
-from datetime import datetime, date
+from dateutil.relativedelta import relativedelta
+from datetime import date
 
 class HopAgentSale(models.Model):
     _name = "hop.agent.sale"
@@ -17,6 +18,143 @@ class HopAgentSale(models.Model):
 
 
     receipt_count = fields.Integer(string="Receipt Count", compute="_compute_receipt_count")
+    replace_count = fields.Integer(string="Receipt Count", compute="_compute_replace_count")
+
+    def action_confirm(self):
+        for line in self.replace_line_ids:
+            if not line.is_working:
+                if line.replacement_type == 'distributor':
+                    if not line.replacement_barcode_id or not line.distributor_barcode_id:
+                        raise ValidationError('Both "Replacement Barcode" and "Distributor Barcode" are required for distributor replacements.')
+                elif line.replacement_type == 'self':
+                    if not line.replacement_barcode_id:
+                        raise ValidationError('"Replacement Barcode" is required for self replacements.')
+                        
+        for line in  self.replace_line_ids:
+            if not line.is_working:
+                if line.barcode_id and line.replacement_barcode_id:
+                    if line.warranty_end_date < date.today():
+                        raise ValidationError("The warranty has expired.") 
+                    
+                replacement_record = self.env['hop.replacement.battery'].sudo().search([('barcode_id', '=', line.barcode_id.id)])
+                replacement_line_record = self.env['hop.replacement.battery.line'].sudo().search([('barcode_id', '=', line.barcode_id.id)])
+
+                if not replacement_record and not replacement_line_record:
+                    line_list = []
+                    line_vals={
+                                        'date' :date.today(),
+                                        'barcode_id' :line.replacement_barcode_id.id,
+                                        
+                                        'product_id':line.replacement_barcode_id.product_id.id,
+                                        'replacement_barcode_id':line.distributor_barcode_id.id,
+                                        'qty':1,
+                                        }
+                    if line.salebill_id.sudo():
+                        line_vals.update({
+                        'salebill_id':line.salebill_id.sudo().id if line.salebill_id.sudo() else False,
+                        'sale_bill_name':line.salebill_id.sudo().name if line.salebill_id.sudo() else False,
+                        })
+                    line_list.append((0,0,line_vals))
+                    vals = {
+                            'party_id':line.party_id.id,
+                            'replacement_type':line.replacement_type,
+                            'date':line.date,
+                            'warranty_end_date':line.warranty_end_date,
+                            
+                            'sale_bill_name':line.salebill_id.sudo().name if line.salebill_id.sudo() else False,
+                            'barcode_id':line.barcode_id.id,
+                            'product_id':line.barcode_id.product_id.id,
+                            'line_ids':line_list
+                        }
+                    if  line.salebill_id.sudo():
+                        vals.update({'salebill_id':line.salebill_id.sudo().id if line.salebill_id.sudo() else False,})
+                    replacement = self.env['hop.replacement.battery'].sudo().create(
+                    vals 
+                    )
+                    
+                    for line in replacement.line_ids:
+                        line.barcode_id.origin = line.sale_bill_name
+                        line.barcode_id.stage = 'replace'
+                        line.barcode_id.replace_id = replacement.id
+                        if line.replacement_barcode_id:
+                            line.replacement_barcode_id.stage = 'sale'
+
+                elif replacement_line_record:
+                    line_list = []
+                    line_list.append((0,0,{
+                                        'date' :date.today(),
+                                        'barcode_id' :line.replacement_barcode_id.id,
+                                        'salebill_id':line.salebill_id.sudo().id if line.salebill_id.sudo() else False,
+                                        'sale_bill_name':line.salebill_id.sudo().name if line.salebill_id.sudo() else False,
+                                        'product_id':line.replacement_barcode_id.product_id.id,
+                                        'replacement_barcode_id':line.distributor_barcode_id.id,
+                                        'qty':1,
+                                        }))
+                    replacement_line_record.sudo().mst_id.line_ids = line_list
+                    for line in replacement_line_record.mst_id.line_ids:
+                        line.barcode_id.origin = line.sale_bill_name
+                        line.barcode_id.stage = 'replace'
+                        line.barcode_id.replace_id = replacement_line_record.mst_id.id
+                        if line.replacement_barcode_id:
+                            line.replacement_barcode_id.stage = 'sale'
+  
+            
+                elif replacement_record:
+
+                    line_list = []
+                    line_list.append((0,0,{
+                                        'date' :date.today(),
+                                        'barcode_id' :line.replacement_barcode_id.id,
+                                        'salebill_id':line.salebill_id.sudo().id if line.salebill_id.sudo() else False,
+                                        'sale_bill_name':line.salebill_id.sudo().name if line.salebill_id.sudo() else False,
+                                        'product_id':line.replacement_barcode_id.product_id.id,
+                                        'replacement_barcode_id':line.distributor_barcode_id.id,
+                                        'qty':1,
+                                        }))
+
+                    replacement_record.sudo().line_ids = line_list
+                    for line in replacement_record.line_ids:
+                        line.barcode_id.origin = line.sale_bill_name
+                        line.barcode_id.stage = 'replace'
+                        line.barcode_id.replace_id = replacement_record.id
+                        if line.replacement_barcode_id:
+                            line.replacement_barcode_id.stage = 'sale'
+                    
+            
+    @api.depends('replace_line_ids')
+    def _compute_replace_count(self):
+        for record in self:
+            count = 0
+            for line in record.replace_line_ids:
+                if not line.is_working:
+                    barcode_id = line.barcode_id.id
+                    if self.env['hop.replacement.battery'].sudo().search_count([('barcode_id', '=', barcode_id)]) > 0:
+                        count += 1
+                    elif self.env['hop.replacement.battery.line'].sudo().search_count([('barcode_id', '=', barcode_id)]) > 0:
+                        count += 1
+            record.replace_count = count
+
+
+    def action_view_replacement(self):
+        for record in self:
+            ids_list=[]
+            for line in record.replace_line_ids:
+                if not line.is_working:
+                    replacement_record = self.env['hop.replacement.battery'].sudo().search([('barcode_id', '=', line.barcode_id.id)])
+                    replacement_line_record = self.env['hop.replacement.battery.line'].sudo().search([('barcode_id', '=', line.barcode_id.id)])
+                    if replacement_record:
+                        ids_list.append(replacement_record.id)
+                    if replacement_line_record:
+                        ids_list.append(replacement_line_record.mst_id.id)
+
+            return {
+                'name':"Battery Replacements Tracking",
+                'type': 'ir.actions.act_window',
+                'res_model': 'hop.replacement.battery',
+                'view_mode': 'tree,form',
+                'domain': [('id', 'in', ids_list)],
+            }
+
 
     @api.depends('payment_ids')
     def _compute_receipt_count(self):
@@ -119,5 +257,128 @@ class Battery_replace(models.Model):
     _name = "hop.battery.replace"
 
     mst_id = fields.Many2one('hop.agent.sale',string="Offer")
+
     barcode_id  = fields.Many2one('hop.purchasebill.line.barcode',string="Barcode")
     is_working  = fields.Boolean(string="Is Working")
+    party_id = fields.Many2one('res.partner',string="Party",domain=['|',('acc_type','=','SALE_PARTY'),('is_common','=',True)])
+    date = fields.Date(string='Date')
+    salebill_id = fields.Many2one('hop.salebill',"Sale")
+    replacement_barcode_id = fields.Many2one('hop.purchasebill.line.barcode' ,string="Replacement Barcode")
+    distributor_barcode_id = fields.Many2one('hop.purchasebill.line.barcode' ,string="Distributor Barcode")
+    warranty_end_date = fields.Date(string='Warranty Date')
+    is_manual = fields.Boolean(default=False,string="Manual")
+    replacement_type = fields.Selection([
+        ('self', 'Self'),
+        ('distributor', 'Distributor')],
+        string='Replacement Type',
+        default='self')
+
+    @api.onchange('replacement_type')
+    def onchange_replacement_type(self):
+        domain = []
+        if self.replacement_type == 'distributor':
+            domain.append(('stage', '=', 'sale'))
+        else:
+             domain.append(('stage', '=', 'new'))
+
+        return {'domain': {'replacement_barcode_id': domain}}
+        
+    @api.onchange('barcode_id','replacement_barcode_id')
+    def _onchange_barcode_id(self):
+        if self.barcode_id:
+            self.is_manual = self.barcode_id.is_manual
+            replacement = self.env['hop.replacement.battery'].sudo().search([('barcode_id', '=', self.barcode_id.id)])
+            sale = self.env['hop.salebill.line'].sudo().search([('barcode_ids', 'in', self.barcode_id.ids)])
+            replacement_line_record = self.env['hop.replacement.battery.line'].sudo().search([('barcode_id', '=', self.barcode_id.id)])
+
+            replacement_again_replace =  self.env['hop.replacement.battery.line'].sudo().search([('replacement_barcode_id', '=', self.barcode_id.id)])
+            if not replacement_again_replace:
+                if not self.barcode_id.is_manual :
+                    if not replacement and not sale and  not replacement_line_record:
+                        raise ValidationError('No Barcode Found !!!')
+            sale_barcode =  False
+            product_id = False
+            if not self.barcode_id.is_manual :
+                if not  replacement_again_replace:
+                    if replacement or sale or  replacement_line_record:
+                        if replacement:
+                            sale_barcode = replacement.salebill_id
+                            product_id = replacement.barcode_id.product_id
+                            self.replacement_type =  replacement.replacement_type
+                        elif replacement_line_record:
+                            sale_barcode = replacement_line_record.mst_id.salebill_id
+                            product_id = replacement_line_record.barcode_id.product_id
+                            self.replacement_type =  replacement_line_record.mst_id.replacement_type
+                            self.party_id = replacement_line_record.mst_id.party_id.id
+                        elif sale:
+                            sale_barcode = sale.mst_id.id
+                            product_id= sale.product_id
+                        sale_record  = self.env['hop.salebill'].sudo().search([('id', '=', sale_barcode)])
+                        if not sale_record:
+                            replacement_again_replace = self.env['hop.replacement.battery.line'].sudo().search([('barcode_id', '=', self.barcode_id.id)])
+                            self.replacement_type =  replacement_again_replace.mst_id.replacement_type
+                            self.date = replacement_again_replace.mst_id.date
+                            product_id= replacement_again_replace.product_id
+                            product_warranty_months = product_id.warranty + product_id.distributor_warranty
+
+                            salebill_date = replacement_again_replace.mst_id.date
+                            warranty_end_date = salebill_date + relativedelta(months=product_warranty_months)
+                            self.warranty_end_date = warranty_end_date
+
+                            sale_record  = self.env['hop.salebill'].sudo().search([('id', '=', replacement_again_replace.salebill_id)])
+                            if sale_record:
+                                self.party_id = sale_record.party_id.id
+                            self.salebill_id = False
+                        else:
+                            salebill_date = sale_record.date
+                            product_warranty_months = product_id.warranty + product_id.distributor_warranty
+                            warranty_end_date = salebill_date + relativedelta(months=product_warranty_months)
+                            self.warranty_end_date = warranty_end_date
+                            self.date = sale_record.date
+                            self.party_id = sale_record.party_id.id
+                            self.salebill_id = sale_record.id
+
+                else:
+                    self.replacement_type =  replacement_again_replace.mst_id.replacement_type
+                    self.date = replacement_again_replace.date
+                    product_id= replacement_again_replace.product_id
+                    product_warranty_months = product_id.warranty + product_id.distributor_warranty
+
+                    salebill_date = replacement_again_replace.date
+                    warranty_end_date = salebill_date + relativedelta(months=product_warranty_months)
+                    self.warranty_end_date = warranty_end_date
+
+                    sale_record  = self.env['hop.salebill'].sudo().search([('id', '=', replacement_again_replace.salebill_id)])
+                    self.party_id = sale_record.party_id.id
+                    self.salebill_id = False
+            else:
+                replacement_line_record = self.env['hop.replacement.battery.line'].sudo().search([('barcode_id', '=', self.barcode_id.id)])
+                replacement_again_replace =  self.env['hop.replacement.battery.line'].sudo().search([('replacement_barcode_id', '=', self.barcode_id.id)])
+                replacement = self.env['hop.replacement.battery'].sudo().search([('barcode_id', '=', self.barcode_id.id)])
+
+                if replacement :
+                        self.party_id = replacement.party_id.id 
+                        self.date = replacement.date
+                        self.warranty_end_date = replacement.warranty_end_date
+                elif replacement_line_record:
+                        self.party_id = replacement_line_record.mst_id.party_id.id 
+                        self.date = replacement_line_record.mst_id.date
+                        self.warranty_end_date = replacement_line_record.mst_id.warranty_end_date
+
+        if self.replacement_barcode_id:
+            sale_barcode = self.env['hop.salebill.line'].sudo().search([('barcode_ids', 'in', self.replacement_barcode_id.ids)])
+            if sale_barcode and self.replacement_type != 'distributor':
+                str_error = "This barcode has already been sold in " + sale_barcode.mst_id.name
+                raise ValidationError(str_error)
+            
+            replacement_line_record = self.env['hop.replacement.battery.line'].sudo().search(['|',('barcode_id', '=', self.replacement_barcode_id.id),('replacement_barcode_id', '=', self.replacement_barcode_id.id)])
+            if replacement_line_record:
+                raise ValidationError("This battery has already been replaced.")
+            
+            replacement = self.env['hop.replacement.battery'].sudo().search([('barcode_id', '=', self.replacement_barcode_id.id)])
+            if replacement:
+                raise ValidationError("This battery has already been replaced.")
+    
+        if self.warranty_end_date  and self.warranty_end_date < date.today():
+            raise ValidationError("The warranty has expired.") 
+        

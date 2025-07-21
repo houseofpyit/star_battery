@@ -13,6 +13,12 @@
                       type='object' 
                     attrs="{'invisible': [('receipt_count', '!=', 0)]}"
                       class='oe_highlight'/>
+
+                    <button name='action_confirm'
+                      string='Create Replacements' 
+                      type='object' 
+                      attrs="{'invisible': [('replace_count', '!=', 0)]}"
+                      class='oe_highlight'/>
                     
                 </header>
 
@@ -25,6 +31,17 @@
                                 attrs="{'invisible': [('receipt_count', '=', 0)]}">
                             <field name="receipt_count" widget="statinfo" string="Receipts"/>
                         </button>
+
+                        <button name="action_view_replacement"
+                                type="object"
+                                class="oe_stat_button"
+                                icon="fa-file-text-o"
+                                attrs="{'invisible': [('replace_count', '=', 0)]}">
+                            <field name="replace_count" widget="statinfo" string="Receipts"/>
+                        </button>
+
+
+                        
                     </div>
                     <group>
                         <group>
@@ -60,10 +77,24 @@
                         <page name="battery_replace" string="Battery Replacement Details">
                             <field name="replace_line_ids">
                                 <tree editable="bottom">
-                                   <field name="barcode_id" width="40%" required="1" force_save="1" domain="[('stage', 'in', ('sale','replace'))]"
-                                options="{'no_create_edit': True,'no_create': True, 'no_quick_create': True}" />
-                                    <field name="is_working"  width="40%" widget="boolean_toggle"/>
-
+                                    <field name="replacement_type" required="1"/>
+                                    <field name="barcode_id" required="1" force_save="1" domain="[('stage', 'in', ('sale','replace'))]"
+                                        options="{'no_create_edit': True,'no_create': True, 'no_quick_create': True}" />
+                                        <field name="is_manual" force_save="1"  invisible="1"/>
+                                    <field name="replacement_barcode_id"  force_save="1"   
+                                        options="{'no_create_edit': True,'no_create': True, 'no_quick_create': True}" />
+                                    <field name="distributor_barcode_id"  force_save="1" attrs="{'readonly': [('replacement_type', '!=','distributor')]}"
+                                        options="{'no_create_edit': True,'no_create': True, 'no_quick_create': True}" domain="[('stage', '=', 'new')]"/>
+                            
+                                    <field name="party_id" force_save="1" 
+                                        options="{'no_create_edit': True,'no_create': True, 'no_quick_create': True}"
+                                        attrs="{'readonly': [('is_manual', '!=',True)]}"/>
+                                    <field name="date"  force_save="1" attrs="{'readonly': [('is_manual', '!=',True)]}" />
+                                    <field name="salebill_id" force_save="1" 
+                                        options="{'no_create_edit': True,'no_create': True, 'no_quick_create': True}"
+                                        attrs="{'readonly': [('is_manual', '!=',True)]}"/>
+                                    <field name="warranty_end_date"  force_save="1" attrs="{'readonly': [('is_manual', '!=',True)]}" />
+                                    <field name="is_working"  widget="boolean_toggle"/>
                                 </tree>
                             </field>
                         </page>
