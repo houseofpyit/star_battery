@@ -13,6 +13,7 @@ class HopAgentSale(models.Model):
     line_ids = fields.One2many('hop.agent.sale.line', 'mst_id',string="Product Details")
     payment_ids = fields.One2many('hop.agent.payment.line', 'mst_id',string="Payment Details")
     total_amount = fields.Float(string="Total Amount")
+    replace_line_ids = fields.One2many('hop.battery.replace', 'mst_id',string="Battery Replacement Details")
 
 
     receipt_count = fields.Integer(string="Receipt Count", compute="_compute_receipt_count")
@@ -112,5 +113,11 @@ class HopReceipt(models.Model):
 
     agent_id = fields.Many2one('res.partner', string="Agent", domain=[('acc_type','=','AGENT')],tracking=True)
     agent_payment_line_id = fields.Many2one('hop.agent.payment.line', string="Agent payment")
-    
 
+
+class Battery_replace(models.Model):
+    _name = "hop.battery.replace"
+
+    mst_id = fields.Many2one('hop.agent.sale',string="Offer")
+    barcode_id  = fields.Many2one('hop.purchasebill.line.barcode',string="Barcode")
+    is_working  = fields.Boolean(string="Is Working")

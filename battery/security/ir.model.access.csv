@@ -15,4 +15,5 @@ access_hop_agent_sale,hop_agent_sale,model_hop_agent_sale,,1,1,1,1
 access_hop_agent_sale_line,hop_agent_sale_line,model_hop_agent_sale_line,,1,1,1,1
 access_agent_sale_rpt_wizard,agent_sale_rpt_wizard,model_agent_sale_rpt_wizard,,1,1,1,1
 access_hop_agent_payment_line,hop_agent_payment_line,model_hop_agent_payment_line,,1,1,1,1
+access_hop_battery_replace,hop_battery_replace,model_hop_battery_replace,,1,1,1,1
 
