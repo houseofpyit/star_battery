@@ -199,7 +199,7 @@ class HopAgentSale(models.Model):
         self.ensure_one()
         receipts = self.env['hop.receipt'].search([('agent_payment_line_id', 'in', self.payment_ids.ids)])
         return {
-            'name': _('Receipts'),
+            'name': 'Receipts',
             'type': 'ir.actions.act_window',
             'res_model': 'hop.receipt',
             'view_mode': 'tree,form',
