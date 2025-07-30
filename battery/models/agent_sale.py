@@ -2,6 +2,7 @@ from odoo import models ,fields, api
 from odoo.exceptions import UserError, ValidationError
 from dateutil.relativedelta import relativedelta
 from datetime import date
+import re
 
 class HopAgentSale(models.Model):
     _name = "hop.agent.sale"
@@ -15,10 +16,49 @@ class HopAgentSale(models.Model):
     payment_ids = fields.One2many('hop.agent.payment.line', 'mst_id',string="Payment Details")
     total_amount = fields.Float(string="Total Amount")
     replace_line_ids = fields.One2many('hop.battery.replace', 'mst_id',string="Battery Replacement Details")
+    barcode = fields.Text(string="Barcode")
 
 
     receipt_count = fields.Integer(string="Receipt Count", compute="_compute_receipt_count")
     replace_count = fields.Integer(string="Receipt Count", compute="_compute_replace_count")
+
+    @api.onchange('barcode')
+    def _onchange_barcode(self):
+        if self.barcode:
+
+            # pattern = r'[A-Za-z0-9]*\(\d{1,2}[-/]\d{1,2}\)\d+'
+            pattern = r'[A-Za-z0-9]*\(\d{1,2}[-/]\d{1,2}\)\d+|[A-Z0-9]{16,}'
+            barcode_list = re.findall(pattern, self.barcode)
+
+            # Remove empty values and strip spaces
+            barcode_list = [b.strip() for b in barcode_list if b.strip()] 
+
+            error_str = self.env['hop.purchasebill.line.barcode'].barcode_check(barcode_list)
+            order_list = []
+            if error_str != '':
+                raise ValidationError(error_str)
+            else:
+                print("**********",barcode_list)
+                barcodes = self.env['hop.purchasebill.line.barcode'].sudo().search([('name', 'in', barcode_list)])
+                print("********",barcodes)
+                if barcodes:
+                    product_id = barcodes[0].product_id
+                
+                    line_record = self.line_ids.filtered(lambda l: l.product_id.id == product_id.id)
+                    if line_record :
+                        barcode_list_all = list(set(line_record.barcode_ids.ids + barcodes.ids))
+                        line_record.barcode_ids = [(6, 0, barcode_list_all)]
+                        line_record.total_qty = len(line_record.barcode_ids)
+                    else:
+                        order_list.append((0, 0, {
+                                'product_id': product_id.id,
+                                'total_qty': len(barcodes.ids),
+                                'barcode_ids':[(6, 0, barcodes.ids)]
+                            }))
+
+                        self.line_ids = order_list
+                    self.barcode = ''
+            
 
     def action_confirm(self):
         for line in self.replace_line_ids:
@@ -216,6 +256,19 @@ class HopAgentSaleLine(models.Model):
     total_qty = fields.Float(string="Total Qty")
     return_qty = fields.Float(string="Return Qty")
     sales_qty = fields.Float(string="Sales Qty")
+    barcode_ids = fields.Many2many('hop.purchasebill.line.barcode',"ref_agent_barcode_id",copy=True)
+    return_barcode_ids = fields.Many2many('hop.purchasebill.line.barcode',"ref_return_agent_barcode_id",copy=True)
+
+    @api.onchange('barcode_ids','return_barcode_ids')
+    def _onchange_barcode_ids(self):
+        if self.barcode_ids:
+            self.total_qty = len(self.barcode_ids)
+        else:
+            self.total_qty = 0
+        if self.return_barcode_ids:
+            self.return_qty = len(self.return_barcode_ids)
+        else:
+            self.return_qty = 0
 
     @api.onchange('total_qty', 'return_qty')
     def _onchange_total_qty(self):
