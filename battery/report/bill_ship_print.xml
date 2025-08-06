@@ -46,9 +46,11 @@
                                         <span  t-esc="o.company_id.email"/></b>
                                     </td>
                                     <td style="text-align: right; ">
-                                        <b><span>GSTIN:</span>
+                                        <t t-if="o.company_id.gstno">
+                                            <b><span>GSTIN:</span>
                                         <span  t-esc="o.company_id.gstno"/></b><br/>
-                                        <spa>Estimation</spa>
+                                        </t>
+                                        <spa>Estimat</spa>
                                     </td>
                                 </tr>    
                             </table>  
@@ -191,7 +193,7 @@
                                     <td style="border-left:none;border:1px solid black;"></td>
                                     <!-- <td style="border-left:none;border:1px solid black;"></td> -->
                                     <td style="border-left:none;border:1px solid black;text-align:right;padding-right:5px;">
-                                        <t t-esc="tot_pcs" />
+                                        <t t-esc="'%.2f'%(tot_pcs)" />
                                     </td>
                                     <td style="border-left:none;border:1px solid black;"></td>
                                     <td style="border-left:none;border:1px solid black;text-align:right;padding-right:5px;">
