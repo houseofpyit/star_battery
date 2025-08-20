@@ -222,6 +222,39 @@ class HopAgentSale(models.Model):
                         'net_amt':line.amount,
                 })
             else:
+                allQuery = self.env['sale.outstanding'].sale_outstanding_data( self.env.user.fy_from_date , self.env.user.fy_to_date , line.party_id ,
+                                                        self.company_id ,adjustment="SALE")
+                self.env.cr.execute(allQuery)
+                query_result = self.env.cr.dictfetchall()
+                line_list = []
+                if query_result:
+                    adjustment_amt = line.amount
+                    for rec in query_result:
+                        if adjustment_amt > 0:
+                            salebill_rec = self.env['hop.salebill'].sudo().search([('id','=',rec.get('id'))])
+                            amount = 0
+                            if adjustment_amt > abs(rec.get('balamt',False)):
+                                amount = abs(rec.get('balamt',False))
+                            else:
+                                amount = adjustment_amt
+                            line_list.append((0,0,{
+                                'module':'sale',
+                                'bill_id':rec.get('id'),
+                                'bill_no':salebill_rec.name,
+                                'bill_date':salebill_rec.date,
+                                'adjust_amt': amount,
+                                'bill_amt': rec.get('net_amt'),
+                                'balance_amt':abs(rec.get('balamt',False)),
+                                'taxeble_amt':salebill_rec.tot_taxable,
+                                'part_rc_amt':rec.get('adjustamt',False),
+                                'ret_amt':abs(rec.get('retamt',False)),
+                                'dr_amt':abs(rec.get('dramt',False)),
+                                'cr_amt':abs(rec.get('cramt',False)),
+                                'jv_amt':abs(rec.get('jvamt',False)),
+                                'diff_amt':abs(rec.get('balamt',False)) - amount,
+                                'company_id':self.company_id.id,
+                            }))
+                            adjustment_amt = adjustment_amt - amount
                 self.env['hop.receipt'].create({
                         'bill_no':self.env['hop.receipt'].bill_chr_vld(str_order_chr='CSH' if line.payment_type == 'cash' else 'BNK',str_mode='CASH' if line.payment_type == 'cash' else 'CHQ'),
                         'bill_chr':'CSH' if line.payment_type == 'cash' else 'BNK',
@@ -231,7 +264,8 @@ class HopAgentSale(models.Model):
                         'date':self.date,
                         'net_amt':line.amount,
                         'agent_payment_line_id':line.id,
-                        'vchr_type':'AGAINST BILL'
+                        'vchr_type':'AGAINST BILL',
+                        'line_id':line_list,
                     })
                 
                 
