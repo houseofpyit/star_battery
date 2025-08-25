@@ -6,7 +6,8 @@
         <field name="inherit_id" ref="transaction.purchasebill_form" />
         <field name="arch" type="xml">
          <xpath expr="//tree/field[@name='hsn_id']" position="after">
-                <field name="barcode" width="100px"/>
+             <field name="barcode" width="100px"/>
+             <field name="box_no" width="100px"/>
                   <field name="barcode_line_id" invisible="1">
                     <tree editable="1">
                         <field name="product_id"  force_save="1" />
@@ -15,6 +16,7 @@
                         <field name="origin" force_save="1" invisible="1" />
                         <field name="line_mst_id" force_save="1" invisible="1" readonly="1" />
                         <field name="purchase_name" force_save="1" invisible="1" readonly="1" />
+                        <field name="box_no" force_save="1" invisible="1" width="100px"/>
                         <field name="date" force_save="1" invisible="1" readonly="1" />
                     </tree>
                 </field>
@@ -28,6 +30,7 @@
             </xpath>
             <xpath expr="//form/group/group/field[@name='hsn_id']" position="after">
                 <field name="barcode" width="100px"/>
+                <field name="box_no" width="100px"/>
             </xpath>
             <xpath expr="//tree/field[@name='disc_per']" position="attributes">
                <attribute name="optional">hide</attribute>

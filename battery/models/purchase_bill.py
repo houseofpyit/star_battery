@@ -97,12 +97,31 @@ class InheritPurchaseBill(models.Model):
 
     barcode_line_id = fields.One2many('hop.purchasebill.line.barcode',"line_mst_id",copy=True)
     barcode = fields.Text(string="Barcode")
+    box_no = fields.Integer(string="Box No")
 
     @api.onchange('barcode')
     def _onchange_barcode(self):
         if self.barcode:
             self.barcode_line_id = False
+            raw = self.barcode
 
+            # --- 1. Extract box number ---
+            m = re.search(r'(?i)box\s*(?:no\.?)?\s*[-#:]*\s*(\d+)', raw)
+            if m:
+                try:
+                    self.box_no = int(m.group(1))
+                except Exception:
+                    self.box_no = False
+            else:
+                self.box_no = False
+            # --- 2. Clean the string ---
+            # remove "BOX NO-73"
+            cleaned = re.sub(r'(?i)box\s*(?:no\.?)?\s*[-#:]*\s*\d+', '', raw)
+            # remove product prefix like
+            cleaned = re.sub(r'^[A-Za-z\s]+-\d+/\d+', '', cleaned).strip()
+            # update the field
+            self.barcode = cleaned
+                
             # Updated: Apply regex directly instead of splitting by commas first
             # pattern = r'[A-Za-z]*\(\d{2}-\d{2}\)\d+|[A-Za-z0-9]+'
             # pattern = r'[A-Za-z0-9]*\(\d{2}-\d{2}\)\d+|[A-Za-z0-9]+'
@@ -128,6 +147,7 @@ class InheritPurchaseBill(models.Model):
                     'purchase_name': self.mst_id.name,
                     'line_mst_id': self.id,
                     'date':self.mst_id.date,
+                    'box_no':self.box_no
                 }))
 
             if duplicate_barcodes:
@@ -170,6 +190,7 @@ class purchasebillLineBarcode(models.Model):
     purchase_id = fields.Integer(string='purchase')
     replace_id = fields.Integer(string='Replace')
     sale_id = fields.Integer(string='Sale')
+    box_no = fields.Integer(string="Box No")
 
     @api.model
     def create(self, vals):

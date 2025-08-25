@@ -120,6 +120,25 @@ class HopInheritSalebill(models.Model):
             # pattern = r'[A-Za-z]*\(\d{2}-\d{2}\)\d+|[A-Za-z0-9]+'
             # pattern = r'[A-Za-z0-9]*\(\d{2}-\d{2}\)\d+|[A-Za-z0-9]+'
             # pattern = r'[A-Za-z0-9]*\(\d{1,2}[-/]\d{1,2}\)\d+'
+            raw = self.barcode
+
+            # --- 1. Extract box number ---
+            m = re.search(r'(?i)box\s*(?:no\.?)?\s*[-#:]*\s*(\d+)', raw)
+            box_no = False
+            if m:
+                try:
+                    box_no = int(m.group(1))
+                except Exception:
+                    box_no = False
+            else:
+                box_no = False
+            # --- 2. Clean the string ---
+            # remove "BOX NO-73"
+            cleaned = re.sub(r'(?i)box\s*(?:no\.?)?\s*[-#:]*\s*\d+', '', raw)
+            # remove product prefix like
+            cleaned = re.sub(r'^[A-Za-z\s]+-\d+/\d+', '', cleaned).strip()
+            # update the field
+            self.barcode = cleaned
             pattern = r'[A-Za-z0-9]*\(\d{1,2}[-/]\d{1,2}\)\d+|[A-Z0-9]{16,}'
             barcode_list = re.findall(pattern, self.barcode)
 
@@ -151,7 +170,8 @@ class HopInheritSalebill(models.Model):
                             'cut':product_id.cut,
                             'rate' : sale_rate,
                             'unit_id': product_id.unit_id.id,
-                            'barcode_ids':[(6, 0, barcodes.ids)]
+                            'barcode_ids':[(6, 0, barcodes.ids)],
+                            'box_no':barcodes[0].box_no if barcodes[0].box_no else False
 
                         }))
                     self.line_id = order_list
@@ -216,6 +236,7 @@ class InheritSaleBillLine(models.Model):
 
     warranty = fields.Integer(string='Warranty (Months)')
     warranty_end_date = fields.Date(string='Warranty Date')
+    box_no = fields.Integer(string="Box No")
 
     @api.model
     def create(self,vals):
@@ -241,6 +262,8 @@ class InheritSaleBillLine(models.Model):
     @api.onchange('barcode_ids')
     def _onchange_barcode_ids(self):
         self.pcs = len(self.barcode_ids)
+        if self.barcode_ids:
+             self.box_no = self.barcode_ids[0].box_no if self.barcode_ids[0].box_no else False
         # barcode_list = []
         # for bar in self.barcode_ids:
         #     barcode_list.append(bar.name)

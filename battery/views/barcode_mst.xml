@@ -18,6 +18,7 @@
                         <field name="purchase_name"/>
                         <field name="is_manual"  readonly="1"/>
                         <field name="date" force_save="1" invisible="1" />
+                        <field name="box_no" readonly="1"/>
                         <field name="purchase_id" force_save="1" groups="base.group_no_one" />
                         <field name="replace_id" force_save="1" groups="base.group_no_one"/>
                         <field name="sale_id" force_save="1" groups="base.group_no_one"/>
@@ -33,6 +34,7 @@
         <field name="arch" type="xml">
             <tree string="Barcodes" >
                 <field name="name" force_save="1" />
+                <field name="box_no" readonly="1"/>
                 <field name="stage" force_save="1" />
                 <field name="product_id" force_save="1"/>
                 <field name="origin" force_save="1" />
