@@ -134,7 +134,7 @@ class inheritStockReport(models.Model):
     
     def replace_battery(self,from_date,to_date,product_ids,category_ids,company_ids,fields=False,join_table=False,condition=False,group_by=False,sub_category_ids=False):
 
-        query = """  select COALESCE(c.name,'') as itemname , COALESCE(d.name,'') as category , 0 as op_pcs , 0 as op_meter , 0 as op_weight , 
+        query = """  select COALESCE(c.name,'') as itemname , COALESCE(d.name,'') as category , COALESCE(g.name,'') as sub_category , 0 as op_pcs , 0 as op_meter , 0 as op_weight , 
                    0 as pur_pcs ,0 as pur_meter , 0 as pur_weight , 
                     0 as sale_ret_pcs , 0 as sale_ret_meter , 0 as sale_ret_weight , 
                     0 as sale_order_pcs , 0 as sale_order_meter , 0 as sale_order_weight , 
@@ -159,7 +159,8 @@ class inheritStockReport(models.Model):
                     left join hop_product_mst as c on c.id =  b.product_id
                     left join hop_category_mst as d on d.id = c.category_id
                     left join hop_unit_mst as e on e.id = c.unit_id  
-                    left join hop_salebill as f on b.salebill_id = f.id """
+                    left join hop_salebill as f on b.salebill_id = f.id 
+                    left join hop_category_mst as g on g.id = c.sub_category_id """
         if join_table:
             query += join_table
 
@@ -178,13 +179,13 @@ class inheritStockReport(models.Model):
             
             
         query += ' group by '
-        query += """ c.name , d.name ,e.name ,b.date,a.party_id, b.product_id,f.name"""
+        query += """ c.name , d.name ,e.name ,g.name,b.date,a.party_id, b.product_id,f.name"""
         if group_by:
              query += group_by
         return query
     
     def opening_purchasebill(self,from_date,to_date,product_ids,category_ids,company_ids,fields=False,join_table=False,condition=False,group_by=False,sub_category_ids=False):
-        query = """ select COALESCE(c.name,'') as itemname , COALESCE(d.name,'') as category , -1 *  COALESCE(sum(b.pcs),0)  as op_pcs , -1 * COALESCE(sum(b.meter),0)  as op_meter , -1 * COALESCE(sum(b.weight),0) as op_weight , 
+        query = """ select COALESCE(c.name,'') as itemname , COALESCE(d.name,'') as category ,COALESCE(f.name,'') as sub_category , -1 *  COALESCE(sum(b.pcs),0)  as op_pcs , -1 * COALESCE(sum(b.meter),0)  as op_meter , -1 * COALESCE(sum(b.weight),0) as op_weight , 
                    0 as pur_pcs ,0 as pur_meter , 0  as pur_weight , 
                     0 as sale_ret_pcs , 0 as sale_ret_meter , 0 as sale_ret_weight , 
                     0 as sale_order_pcs , 0 as sale_order_meter , 0 as sale_order_weight , 
@@ -207,7 +208,10 @@ class inheritStockReport(models.Model):
                     inner join hop_purchasebill_line as b on a.id = b.mst_id 
                     left join hop_product_mst as c on c.id =  b.product_id
                     left join hop_category_mst as d on d.id = c.category_id
-                    left join hop_unit_mst as e on e.id = c.unit_id """
+                    left join hop_unit_mst as e on e.id = c.unit_id 
+                    left join hop_category_mst as f on f.id = c.sub_category_id """
+
+        
         if join_table:
             query += join_table
 
@@ -226,7 +230,7 @@ class inheritStockReport(models.Model):
             
             
         query += ' group by '
-        query += """  c.name , d.name ,e.name,a.name,a.party_id,a.date , b.product_id,b.rate"""
+        query += """  c.name , d.name ,e.name,a.name,f.name,a.party_id,a.date , b.product_id,b.rate"""
         if group_by:
              query += group_by
         return query
@@ -243,7 +247,7 @@ class inheritStockReport(models.Model):
     
     def stock_report(self,from_date,to_date,product_ids,category_ids,stock_status,stock_wise,company_ids,fields=False,bal_pcs_fields = False,bal_meter_fields = False,bal_weight_fields=False,group_by=False,sub_category_ids=False):
         query = self.stock_report_query(from_date,to_date,product_ids,category_ids,company_ids,sub_category_ids=sub_category_ids)
-        allQuery = """ select x.product_id ,x.itemname  , x.category  ,
+        allQuery = """ select x.product_id ,x.itemname  , x.category  ,x.sub_category
                 sum(x.op_pcs) as op_pcs  , sum(x.op_meter) as op_meter , sum(x.op_weight) as op_weight , 
                 sum(x.pur_pcs) as pur_pcs ,sum(x.pur_meter) as pur_meter , sum(x.pur_weight) as pur_weight , 
                 sum(x.sale_ret_pcs) as sale_ret_pcs ,sum(x.sale_ret_meter) as sale_ret_meter ,  sum(x.sale_ret_weight) as sale_ret_weight , 
@@ -279,7 +283,7 @@ class inheritStockReport(models.Model):
         allQuery +=  """ from (%s) as x  """%query
         allQuery += " where 1=1 "
         allQuery += " group by "
-        allQuery += " x.itemname ,x.category,x.unit,x.product_id,x.minimum_qty "
+        allQuery += " x.itemname ,x.category,x.sub_category,x.unit,x.product_id,x.minimum_qty "
         if group_by:
             allQuery += group_by
         allQuery += " having  1=1 "
