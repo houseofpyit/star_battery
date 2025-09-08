@@ -8,40 +8,39 @@
         <field name="arch" type="xml">
             <form string="Agent Sale">
                 <header>
-                     <button name='create_receipt'
-                      string='Create Receipts' 
-                      type='object' 
-                    attrs="{'invisible': [('receipt_count', '!=', 0)]}"
-                      class='oe_highlight'/>
+                    <button name='create_receipt'
+                        string='Create Receipts'
+                        type='object'
+                        attrs="{'invisible': [('receipt_count', '!=', 0)]}"
+                        class='oe_highlight' />
 
                     <button name='action_confirm'
-                      string='Create Replacements' 
-                      type='object' 
-                      attrs="{'invisible': [('replace_count', '!=', 0)]}"
-                      class='oe_highlight'/>
-                    
+                        string='Create Replacements'
+                        type='object'
+                        attrs="{'invisible': [('replace_count', '!=', 0)]}"
+                        class='oe_highlight' />
+
                 </header>
 
                 <sheet>
-                    <div class="oe_button_box" name="button_box" >
+                    <div class="oe_button_box" name="button_box">
                         <button name="action_view_receipts"
-                                type="object"
-                                class="oe_stat_button"
-                                icon="fa-file-text-o"
-                                attrs="{'invisible': [('receipt_count', '=', 0)]}">
-                            <field name="receipt_count" widget="statinfo" string="Receipts"/>
+                            type="object"
+                            class="oe_stat_button"
+                            icon="fa-file-text-o"
+                            attrs="{'invisible': [('receipt_count', '=', 0)]}">
+                            <field name="receipt_count" widget="statinfo" string="Receipts" />
                         </button>
 
                         <button name="action_view_replacement"
-                                type="object"
-                                class="oe_stat_button"
-                                icon="fa-file-text-o"
-                                attrs="{'invisible': [('replace_count', '=', 0)]}">
-                            <field name="replace_count" widget="statinfo" string="Replacement"/>
+                            type="object"
+                            class="oe_stat_button"
+                            icon="fa-file-text-o"
+                            attrs="{'invisible': [('replace_count', '=', 0)]}">
+                            <field name="replace_count" widget="statinfo" string="Replacement" />
                         </button>
 
 
-                        
                     </div>
                     <group>
                         <group>
@@ -49,71 +48,305 @@
                         </group>
                         <group>
                             <field name="date" />
-                            <field name="company_id" invisible="1"/>
+                            <field name="company_id" invisible="1" />
                         </group>
                     </group>
                     <notebook>
                         <page name="sale_details" string="Sale Details">
-                            <group >
-                                <field name="barcode" width="100px"/>
+                            <group>
+                                <field name="barcode" width="100px" />
                             </group>
-                            <field name="line_ids">
+                            <field name="line_ids" mode="tree,form,kanban">
+                                <!-- TREE (unchanged) -->
                                 <tree editable="bottom">
-                                    <field name="product_id"  />
-                                    <field name="barcode_ids" widget="many2many_tags" domain="[('product_id','=',product_id)]"/>
-                                    <field name="return_barcode_ids" widget="many2many_tags" domain="[('id', 'in', barcode_ids),('product_id','=',product_id)]" />
-                                    <field name="total_qty"  />
-                                    <field name="return_qty"  />
-                                    <field name="sales_qty"  />
+                                    <field name="product_id" />
+                                    <field name="barcode_ids" widget="many2many_tags"
+                                        domain="[('product_id','=',product_id)]" />
+                                    <field name="return_barcode_ids" widget="many2many_tags"
+                                        domain="[('id','in',barcode_ids), ('product_id','=',product_id)]" />
+                                    <field name="total_qty" />
+                                    <field name="return_qty" />
+                                    <field name="sales_qty" />
                                 </tree>
+
+                                <!-- FORM (unchanged) -->
+                                <form>
+                                    <group>
+                                        <field name="product_id" />
+                                        <field name="barcode_ids" widget="many2many_tags"
+                                            domain="[('product_id','=',product_id)]" />
+                                        <field name="return_barcode_ids" widget="many2many_tags"
+                                            domain="[('id','in',barcode_ids), ('product_id','=',product_id)]" />
+                                        <field name="total_qty" />
+                                        <field name="return_qty" />
+                                        <field name="sales_qty" />
+                                    </group>
+                                </form>
+
+                                <!-- KANBAN (add hidden fields used by domains) -->
+                                <kanban class="o_kanban_small_column">
+                                    <templates>
+                                        <t t-name="kanban-box">
+                                            <div class="o_kanban_record">
+
+                                                <!-- Make sure fields used in domains are present in
+                                                the view -->
+                                                <field name="product_id" invisible="1" />
+                                                <field name="barcode_ids" invisible="1" />
+
+                                                <div class="o_kanban_primary_left">
+                                                    <strong
+                                                        t-esc="record.product_id.value and record.product_id.value[1]" />
+                                                    <div class="mt8">
+                                                        <span class="text-muted">Barcodes:</span>
+                                                        <field name="barcode_ids"
+                                                            widget="many2many_tags"
+                                                            domain="[('product_id','=',product_id)]" />
+                                                    </div>
+                                                    <div class="mt4">
+                                                        <span class="text-muted">Returns:</span>
+                                                        <field name="return_barcode_ids"
+                                                            widget="many2many_tags"
+                                                            domain="[('id','in',barcode_ids), ('product_id','=',product_id)]" />
+                                                    </div>
+                                                </div>
+
+                                                <div class="o_kanban_primary_right">
+                                                    <div class="o_kanban_badge">
+                                                        <span>Total</span>
+                                                        <strong t-esc="record.total_qty.value" />
+                                                    </div>
+                                                    <div class="o_kanban_badge">
+                                                        <span>Return</span>
+                                                        <strong t-esc="record.return_qty.value" />
+                                                    </div>
+                                                    <div class="o_kanban_badge">
+                                                        <span>Sales</span>
+                                                        <strong t-esc="record.sales_qty.value" />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </t>
+                                    </templates>
+                                </kanban>
                             </field>
+
                         </page>
                         <page name="payment_ids" string="Payment Details">
-                            <field name="payment_ids">
-                                <tree editable="bottom">
-                                    <field name="payment_type"  required="1"/>
-                                    <field name="party_id"  required="1"/>
-                                    <field name="trn_char"  force_save="1" invisible="1"/>
-                                    <field name="bank_id"  style="width:65%;" required="1" context="{'form_view_ref':'master.party_mst_form','default_acc_type':trn_char}" domain="[('acc_type','=',trn_char)]" options="{'no_quick_create': True}" />
-                                    <field name="amount"  sum="amount"  />
+                            <field name="payment_ids" mode="tree,form,kanban">
+                                <tree
+                                    editable="bottom">
+                                    <field name="payment_type" required="1" />
+                                    <field name="party_id" required="1" />
+                                    <field name="trn_char" force_save="1" invisible="1" />
+                                    <field name="bank_id" style="width:65%;" required="1"
+                                        context="{'form_view_ref':'master.party_mst_form','default_acc_type':trn_char}"
+                                        domain="[('acc_type','=',trn_char)]"
+                                        options="{'no_quick_create': True}" />
+                                    <field name="amount" sum="amount" />
                                 </tree>
+                                <field
+                                    name="payment_ids" mode="tree,form,kanban">
+
+
+                                    <!-- FORM (inline) -->
+                                    <form>
+                                        <group>
+                                            <field name="payment_type" required="1" />
+                                            <field name="party_id" required="1" />
+                                            <field name="trn_char" force_save="1" />
+                                            <field name="bank_id" style="width:65%;" required="1"
+                                                context="{'form_view_ref':'master.party_mst_form','default_acc_type':trn_char}"
+                                                domain="[('acc_type','=',trn_char)]"
+                                                options="{'no_quick_create': True}" />
+                                            <field name="amount" />
+                                        </group>
+                                    </form>
+
+                                    <!-- KANBAN (inline) -->
+                                    <kanban class="o_kanban_small_column">
+                                        <templates>
+                                            <t t-name="kanban-box">
+                                                <div class="o_kanban_record">
+
+                                                    <!-- Include fields used in domain so validator
+                                                    is happy -->
+                                                    <field name="trn_char" invisible="1" />
+
+                                                    <div class="o_kanban_primary_left">
+                                                        <div>
+                                                            <strong
+                                                                t-esc="record.payment_type.value" />
+                                                        </div>
+                                                        <div class="mt4">
+                                                            <i class="fa fa-user" />
+                                                            <t
+                                                                t-esc="record.party_id.value and record.party_id.value[1]" />
+                                                        </div>
+                                                        <div class="mt4">
+                                                            <span class="text-muted">Bank:</span>
+                                                            <field name="bank_id"
+                                                                context="{'form_view_ref':'master.party_mst_form','default_acc_type':trn_char}"
+                                                                domain="[('acc_type','=',trn_char)]"
+                                                                options="{'no_quick_create': True}" />
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="o_kanban_primary_right">
+                                                        <div class="o_kanban_badge">
+                                                            <span>Amount</span>
+                                                            <strong t-esc="record.amount.value" />
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </t>
+                                        </templates>
+                                    </kanban>
+                                </field>
+
                             </field>
                         </page>
                         <page name="battery_replace" string="Battery Replacement Details">
-                            <field name="replace_line_ids">
+                            <field name="replace_line_ids" mode="tree,form,kanban">
+                                <!-- TREE (as-is) -->
                                 <tree editable="bottom">
-                                    <field name="replacement_type" required="1"/>
-                                    <field name="barcode_id" required="1" force_save="1" domain="[('stage', 'in', ('sale','replace'))]"
-                                        options="{'no_create_edit': True,'no_create': True, 'no_quick_create': True}" />
-                                        <field name="is_manual" force_save="1"  invisible="1"/>
-                                    <field name="replacement_barcode_id"  force_save="1"   
-                                        options="{'no_create_edit': True,'no_create': True, 'no_quick_create': True}" />
-                                    <field name="distributor_barcode_id"  force_save="1" attrs="{'readonly': [('replacement_type', '!=','distributor')]}"
-                                        options="{'no_create_edit': True,'no_create': True, 'no_quick_create': True}" domain="[('stage', '=', 'new')]"/>
-                            
-                                    <field name="party_id" force_save="1" 
-                                        options="{'no_create_edit': True,'no_create': True, 'no_quick_create': True}"
-                                        attrs="{'readonly': [('is_manual', '!=',True)]}"/>
-                                    <field name="date"  force_save="1" attrs="{'readonly': [('is_manual', '!=',True)]}" />
-                                    <field name="salebill_id" force_save="1" 
-                                        options="{'no_create_edit': True,'no_create': True, 'no_quick_create': True}"
-                                        attrs="{'readonly': [('is_manual', '!=',True)]}"/>
-                                    <field name="warranty_end_date"  force_save="1" attrs="{'readonly': [('is_manual', '!=',True)]}" />
-                                    <field name="is_working"  widget="boolean_toggle"/>
+                                    <field name="replacement_type" required="1" />
+                                    <field name="barcode_id" required="1" force_save="1"
+                                        domain="[('stage','in',('sale','replace'))]"
+                                        options="{'no_create_edit': True,'no_create': True,'no_quick_create': True}" />
+                                    <field name="is_manual" force_save="1" invisible="1" />
+                                    <field name="replacement_barcode_id" force_save="1"
+                                        options="{'no_create_edit': True,'no_create': True,'no_quick_create': True}" />
+                                    <field name="distributor_barcode_id" force_save="1"
+                                        attrs="{'readonly':[('replacement_type','!=','distributor')]}"
+                                        domain="[('stage','=','new')]"
+                                        options="{'no_create_edit': True,'no_create': True,'no_quick_create': True}" />
+                                    <field name="party_id" force_save="1"
+                                        attrs="{'readonly':[('is_manual','!=',True)]}"
+                                        options="{'no_create_edit': True,'no_create': True,'no_quick_create': True}" />
+                                    <field name="date" force_save="1"
+                                        attrs="{'readonly':[('is_manual','!=',True)]}" />
+                                    <field name="salebill_id" force_save="1"
+                                        attrs="{'readonly':[('is_manual','!=',True)]}"
+                                        options="{'no_create_edit': True,'no_create': True,'no_quick_create': True}" />
+                                    <field name="warranty_end_date" force_save="1"
+                                        attrs="{'readonly':[('is_manual','!=',True)]}" />
+                                    <field name="is_working" widget="boolean_toggle" />
                                 </tree>
+
+                                <!-- FORM (inline) -->
+                                <form>
+                                    <group>
+                                        <field name="replacement_type" required="1" />
+                                        <field name="barcode_id" required="1" force_save="1"
+                                            domain="[('stage','in',('sale','replace'))]"
+                                            options="{'no_create_edit': True,'no_create': True,'no_quick_create': True}" />
+                                        <field name="is_manual" force_save="1" />
+                                        <field name="replacement_barcode_id" force_save="1"
+                                            options="{'no_create_edit': True,'no_create': True,'no_quick_create': True}" />
+                                        <field name="distributor_barcode_id" force_save="1"
+                                            attrs="{'readonly':[('replacement_type','!=','distributor')]}"
+                                            domain="[('stage','=','new')]"
+                                            options="{'no_create_edit': True,'no_create': True,'no_quick_create': True}" />
+                                        <field name="party_id" force_save="1"
+                                            attrs="{'readonly':[('is_manual','!=',True)]}"
+                                            options="{'no_create_edit': True,'no_create': True,'no_quick_create': True}" />
+                                        <field name="date" force_save="1"
+                                            attrs="{'readonly':[('is_manual','!=',True)]}" />
+                                        <field name="salebill_id" force_save="1"
+                                            attrs="{'readonly':[('is_manual','!=',True)]}"
+                                            options="{'no_create_edit': True,'no_create': True,'no_quick_create': True}" />
+                                        <field name="warranty_end_date" force_save="1"
+                                            attrs="{'readonly':[('is_manual','!=',True)]}" />
+                                        <field name="is_working" widget="boolean_toggle" />
+                                    </group>
+                                </form>
+
+                                <!-- KANBAN (inline) -->
+                                <kanban class="o_kanban_small_column">
+                                    <templates>
+                                        <t t-name="kanban-box">
+                                            <div class="o_kanban_record">
+
+                                                <!-- Include all fields referenced in domain/attrs
+                                                so validator passes -->
+                                                <field name="replacement_type" invisible="1" />
+                                                <field name="is_manual" invisible="1" />
+
+                                                <div class="o_kanban_primary_left">
+                                                    <div>
+                                                        <strong>Replacement</strong> — <t
+                                                            t-esc="record.replacement_type.value" />
+                                                    </div>
+
+                                                    <div class="mt6">
+                                                        <span class="text-muted">Old Barcode:</span>
+                                                        <field name="barcode_id"
+                                                            domain="[('stage','in',('sale','replace'))]"
+                                                            options="{'no_create_edit': True,'no_create': True,'no_quick_create': True}" />
+                                                    </div>
+
+                                                    <div class="mt4">
+                                                        <span class="text-muted">New Barcode:</span>
+                                                        <field name="replacement_barcode_id"
+                                                            options="{'no_create_edit': True,'no_create': True,'no_quick_create': True}" />
+                                                    </div>
+
+                                                    <div class="mt4">
+                                                        <span class="text-muted">Distributor
+                                                            Barcode:</span>
+                                                        <field name="distributor_barcode_id"
+                                                            attrs="{'readonly':[('replacement_type','!=','distributor')]}"
+                                                            domain="[('stage','=','new')]"
+                                                            options="{'no_create_edit': True,'no_create': True,'no_quick_create': True}" />
+                                                    </div>
+
+                                                    <div class="mt6">
+                                                        <field name="party_id"
+                                                            attrs="{'readonly':[('is_manual','!=',True)]}"
+                                                            options="{'no_create_edit': True,'no_create': True,'no_quick_create': True}" />
+                                                    </div>
+                                                    <div class="mt2">
+                                                        <field name="date"
+                                                            attrs="{'readonly':[('is_manual','!=',True)]}" />
+                                                    </div>
+                                                    <div class="mt2">
+                                                        <field name="salebill_id"
+                                                            attrs="{'readonly':[('is_manual','!=',True)]}"
+                                                            options="{'no_create_edit': True,'no_create': True,'no_quick_create': True}" />
+                                                    </div>
+                                                    <div class="mt2">
+                                                        <field name="warranty_end_date"
+                                                            attrs="{'readonly':[('is_manual','!=',True)]}" />
+                                                    </div>
+                                                </div>
+
+                                                <div class="o_kanban_primary_right">
+                                                    <div class="o_kanban_badge">
+                                                        <span>Working</span>
+                                                        <field name="is_working"
+                                                            widget="boolean_toggle" />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </t>
+                                    </templates>
+                                </kanban>
                             </field>
+
                         </page>
                     </notebook>
                     <group name="note_group" col="8" class="mt-4 mt-md-0">
-                        
+
                         <group class="oe_subtotal_footer oe_right" colspan="4" name="sale_total">
-                   
+
                             <div class="oe_subtotal_footer_separator oe_inline o_td_label">
                                 <label for="total_amount" />
                             </div>
-                            <field name="total_amount" nolabel="1" class="oe_subtotal_footer_separator" force_save='1' />
+                            <field name="total_amount" nolabel="1"
+                                class="oe_subtotal_footer_separator" force_save='1' />
                         </group>
-                        <div class="oe_clear"/>
+                        <div class="oe_clear" />
                     </group>
                 </sheet>
             </form>
@@ -138,13 +371,17 @@
         <field name="model">hop.agent.sale</field>
         <field name="arch" type="xml">
             <search string="Agent Sale">
-                <field name="agent_id" filter_domain="['|', ('agent_id','ilike',self),('date','ilike',self)]" string="Search"/>
+                <field name="agent_id"
+                    filter_domain="['|', ('agent_id','ilike',self),('date','ilike',self)]"
+                    string="Search" />
                 <field name="agent_id" />
                 <field name="date" />
-                <separator/>
+                <separator />
                 <group expand="0" string="Group By">
-                    <filter string="Agent" name="group_by_agent_id" domain="[]" context="{'group_by': 'agent_id'}"/>
-                    <filter string="Date" name="group_by_date" domain="[]" context="{'group_by': 'date'}"/>
+                    <filter string="Agent" name="group_by_agent_id" domain="[]"
+                        context="{'group_by': 'agent_id'}" />
+                    <filter string="Date" name="group_by_date" domain="[]"
+                        context="{'group_by': 'date'}" />
                 </group>
             </search>
         </field>
@@ -162,21 +399,23 @@
         </field>
     </record>
 
-        <record id="hop_receipt_form_inherit_battery" model="ir.ui.view">
+    <record id="hop_receipt_form_inherit_battery" model="ir.ui.view">
         <field name="name">hop.receipt.form.inherit</field>
         <field name="model">hop.receipt</field>
-        <field name="inherit_id" ref="hop_account.hop_receipt_view_form"/>
+        <field name="inherit_id" ref="hop_account.hop_receipt_view_form" />
         <field name="arch" type="xml">
-             <xpath expr="//field[@name='bank_type']" position="after">
-                <field name="agent_id" context="{'default_acc_type':'AGENT','form_view_ref':'master.party_mst_form'}" options="{'no_quick_create': True}"/>
+            <xpath expr="//field[@name='bank_type']" position="after">
+                <field name="agent_id"
+                    context="{'default_acc_type':'AGENT','form_view_ref':'master.party_mst_form'}"
+                    options="{'no_quick_create': True}" />
             </xpath>
         </field>
     </record>
 
     <!-- Menu Item -->
-    <menuitem id="menu_hop_agent_sale_main" 
-        name="Agent Sale" 
-        sequence="12" 
+    <menuitem id="menu_hop_agent_sale_main"
+        name="Agent Sale"
+        sequence="12"
         web_icon="battery,static/description/img/agent.png" />
 
     <menuitem id="menu_hop_agent_sale"

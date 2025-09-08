@@ -46,6 +46,92 @@
             </tree>
         </field>
     </record>
+<record id="view_purchasebill_line_barcode_kanban" model="ir.ui.view">
+    <field name="name">purchase.bill.line.barcode.kanban</field>
+    <field name="model">hop.purchasebill.line.barcode</field>
+    <field name="arch" type="xml">
+        <kanban default_group_by="stage" class="o_kanban_small_column">
+            <templates>
+                <t t-name="kanban-box">
+                    <div class="o_kanban_record">
+                        <!-- keep keys present (used or shown) -->
+                        <field name="stage" invisible="1"/>
+                        <field name="product_id" invisible="1"/>
+                        <field name="purchase_id" invisible="1"/>
+                        <field name="replace_id" invisible="1"/>
+                        <field name="sale_id" invisible="1"/>
+                        <field name="name" invisible="1"/>
+                        <field name="origin" invisible="1"/>
+                        <field name="purchase_name" invisible="1"/>
+                        <field name="box_no" invisible="1"/>
+                        <field name="date" invisible="1"/>
+
+                        <div class="o_kanban_primary_left">
+                            <div class="o_kanban_title">
+                                <!-- Prefer field renderer or guarded t-esc -->
+                                <t t-esc="record.name and record.name.value or '-'"/>
+                            </div>
+
+                            <!-- Render m2o via <field/> to avoid [1] indexing -->
+                            <div class="mt6">
+                                <span class="text-muted">Product:</span>
+                                <field name="product_id" options="{'no_create_edit': True, 'no_create': True, 'no_quick_create': True}"/>
+                            </div>
+
+                            <div class="mt2">
+                                <span class="text-muted">Box No.:</span>
+                                <t t-esc="record.box_no and record.box_no.value or '-'"/>
+                            </div>
+                            <div class="mt2">
+                                <span class="text-muted">Origin:</span>
+                                <t t-esc="record.origin and record.origin.value or '-'"/>
+                            </div>
+                            <div class="mt2">
+                                <span class="text-muted">Purchase #:</span>
+                                <t t-esc="record.purchase_name and record.purchase_name.value or '-'"/>
+                            </div>
+                            <div class="mt2" t-if="record.date and record.date.value">
+                                <span class="text-muted">Date:</span>
+                                <t t-esc="record.date.value"/>
+                            </div>
+
+                            <!-- <div class="mt8 grid">
+                                <div t-if="record.purchase_id and record.purchase_id.value">
+                                    <span class="text-muted">Purchase:</span>
+                                    <field name="purchase_id" options="{'no_create_edit': True, 'no_create': True, 'no_quick_create': True}"/>
+                                </div>
+                                <div t-if="record.replace_id and record.replace_id.value">
+                                    <span class="text-muted">Replace:</span>
+                                    <field name="replace_id" options="{'no_create_edit': True, 'no_create': True, 'no_quick_create': True}"/>
+                                </div>
+                                <div t-if="record.sale_id and record.sale_id.value">
+                                    <span class="text-muted">Sale:</span>
+                                    <field name="sale_id" options="{'no_create_edit': True, 'no_create': True, 'no_quick_create': True}"/>
+                                </div>
+                            </div> -->
+                        </div>
+
+                        <div class="o_kanban_primary_right">
+                            <div class="o_kanban_badge">
+                                <span>Status</span>
+                                <strong><t t-esc="record.stage and record.stage.value or '-'"/></strong>
+                            </div>
+                            <!-- Optional: object button (uncomment if method exists)
+                            <div class="mt8">
+                                <button type="object" name="update_status"
+                                        class="btn btn-primary btn-sm" groups="base.group_no_one">
+                                    Update Status
+                                </button>
+                            </div>
+                            -->
+                        </div>
+                    </div>
+                </t>
+            </templates>
+        </kanban>
+    </field>
+</record>
+
 
     <!-- Search View with Filters and Group By -->
     <record id="view_purchasebill_line_barcode_search" model="ir.ui.view">
@@ -75,7 +161,7 @@
     <record id="action_purchasebill_line_barcode" model="ir.actions.act_window">
         <field name="name">Barcodes</field>
         <field name="res_model">hop.purchasebill.line.barcode</field>
-        <field name="view_mode">tree,form,search</field>
+        <field name="view_mode">kanban,tree,form,search</field>
          <field name="context">{'default_is_manual':True}</field>
         <field name="search_view_id" ref="view_purchasebill_line_barcode_search"/>
     </record>
