@@ -11,7 +11,7 @@
     </record>
 
     <!-- Menu Item -->
-    <menuitem id="menu_hop_battery_offer_root" name="Battery Offers and Report"
+    <menuitem id="menu_hop_battery_offer_root" name="Offers and Report"
         web_icon="battery,static/description/img/offer.png"
         sequence="10" />
 

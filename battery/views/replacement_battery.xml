@@ -215,7 +215,7 @@
     </record>
 
         <!-- Menu Item -->
-    <menuitem id="menu_hop_replacement_battery_root" name="Battery Replacement" sequence="10" web_icon="battery,static/description/img/battery.png" />
+    <menuitem id="menu_hop_replacement_battery_root" name="Replacement" sequence="10" web_icon="battery,static/description/img/battery.png" />
 
     <menuitem id="menu_hop_replacement_battery"
               name="Tracking"
