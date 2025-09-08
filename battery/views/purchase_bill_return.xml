@@ -9,6 +9,10 @@
              <xpath expr="//tree/field[@name='hsn_id']" position="after">
                 <field name="barcode_ids" width="20%" widget="many2many_tags"/>
             </xpath>
+
+             <xpath expr="//form/group/group/field[@name='hsn_id']" position="after">
+                <field name="barcode_ids" width="20%" widget="many2many_tags"/>
+            </xpath>
         </field>
     </record>
 

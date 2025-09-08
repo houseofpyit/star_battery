@@ -10,6 +10,9 @@
             <xpath expr="//tree/field[@name='hsn_id']" position="after">
                 <field name="barcode_ids" width="20%" widget="many2many_tags" />
             </xpath>
+            <xpath expr="//form/group/group/field[@name='hsn_id']" position="after">
+                <field name="barcode_ids" width="20%" widget="many2many_tags" />
+            </xpath>
             <xpath expr="//tree/field[@name='disc_per']" position="attributes">
                 <attribute name="optional">hide</attribute>
             </xpath>

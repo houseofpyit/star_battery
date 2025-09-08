@@ -20,13 +20,55 @@
                         <button name="fetch_product_list" string="Fetch Product List" type="object" class="btn-primary" />
                     </group>
                 </group>
-                <field name="price_line_ids" widget="section_and_note_one2many" >
-                    <tree editable="bottom">
-                        <field name="product_id" options="{'no_quick_create':True,'no_create_edit':True}" />
-                        <field name="price" />
-                        <field name="disc_per" invisible="1"/>
-                    </tree>
-                </field>
+                <field name="price_line_ids" widget="section_and_note_one2many" mode="tree,form,kanban">
+    <!-- LIST -->
+    <tree editable="bottom">
+        <field name="product_id" options="{'no_quick_create': True, 'no_create_edit': True}"/>
+        <field name="price"/>
+        <field name="disc_per" invisible="1"/>
+    </tree>
+
+    <!-- FORM -->
+    <form string="">
+        <group>
+            <field name="product_id" options="{'no_quick_create': True, 'no_create_edit': True}"/>
+            <field name="price"/>
+            <field name="disc_per" invisible="1"/>
+        </group>
+    </form>
+
+    <!-- KANBAN -->
+    <kanban class="o_kanban_small_column">
+        <templates>
+            <t t-name="kanban-box">
+                <div class="o_kanban_record">
+                    <!-- Keep fields available for template/attrs -->
+                    <field name="product_id" invisible="1"/>
+                    <field name="price" invisible="1"/>
+                    <field name="disc_per" invisible="1"/>
+
+                    <div class="o_kanban_primary_left">
+                        <div class="o_kanban_title">
+                            <field name="product_id" options="{'no_quick_create': True, 'no_create_edit': True}"/>
+                        </div>
+                        <div class="mt4" t-if="record.disc_per and record.disc_per.value">
+                            <span class="text-muted">Discount %:</span>
+                            <t t-esc="record.disc_per.value"/>
+                        </div>
+                    </div>
+
+                    <div class="o_kanban_primary_right">
+                        <div class="o_kanban_badge">
+                            <span>Price</span>
+                            <strong t-esc="record.price and record.price.value or 0.0"/>
+                        </div>
+                    </div>
+                </div>
+            </t>
+        </templates>
+    </kanban>
+</field>
+
             </page>
         </xpath>
     </field>
