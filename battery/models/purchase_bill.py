@@ -14,9 +14,67 @@ class InheritPurchaseBill(models.Model):
     city_id = fields.Many2one('res.city', string="City",related='party_id.city_id')
     due_date = fields.Date(string='Due Date',default=fields.Date.context_today,tracking=True)
 
+    @api.depends('barcode_active')
+    def _compute_barcode_active(self):
+        self.sudo().with_context(compute_method=True).barcode_active = True
+
+    @api.model
+    def default_get(self, fields):
+        res = super(InheritPurchaseBill, self).default_get(fields)
+        res['barcode_active'] = True
+        return res
+
     def update_due_date(self):
         for res in self.search([]):
             res.due_date =  res.date + timedelta(days=res.due_days)
+
+
+    @api.onchange('barcode')
+    def _onchange_barcode(self):
+        if not self.barcode:
+            return
+        hdr_rx  = re.compile(
+            r'(?i)(?P<prod>[A-Za-z0-9/\- ]{3,120}?)\s+BOX\s*(?:NO\.?)?\s*[-:#]*\s*\(\s*(?P<box>\d{1,6})\s*\)',
+            re.DOTALL
+        )
+        code_rx = re.compile(r'[A-Za-z0-9]*\(\d{1,2}[-/]\d{1,2}\)\d+|[A-Z0-9]{12,16}(?=[A-Z]{3}|$)')
+
+        out = []
+        pos = 0
+        while True:
+            m = hdr_rx.search(self.barcode, pos)
+            if not m:
+                break
+
+            prod = (m.group('prod') or '').strip(' \t-\n\r')
+            box  = int(m.group('box'))
+            start_codes = m.end()
+
+            # find next header to know where this group's barcodes stop
+            n = hdr_rx.search(self.barcode, start_codes)
+            end_codes = n.start() if n else len(self.barcode)
+
+            codes = [c.strip() for c in code_rx.findall(self.barcode[start_codes:end_codes]) if c.strip()]
+            if codes:
+                out.append({'product': prod, 'box': box, 'barcodes': codes})
+
+            # continue after this header; do NOT jump past the codes so we can find the next header later
+            pos = start_codes
+        line_list = []
+        for line in out:
+            barcode_line_list =  []
+            product_record = self.env['hop.product.mst'].sudo().search([('name', '=', line.get('product'))], limit=1)
+            line_list.append((0, 0, {
+                        'product_id': product_record.id if product_record else False,
+                        'barcode':", ".join(line.get('barcodes')),
+                        'box_no':line.get('box')
+                    }))
+        self.line_id =  line_list
+        for line in self.line_id:
+            line._onchange_barcode()
+            line._onchange_product_id()  
+            line._onchange_hsn_id()
+
             
     @api.onchange('date')
     def _onchange_date(self):
@@ -92,7 +150,7 @@ class InheritPurchaseBill(models.Model):
         return serial
 
     
-class InheritPurchaseBill(models.Model):
+class InheritPurchaseBillline(models.Model):
     _inherit = 'hop.purchasebill.line'
 
     barcode_line_id = fields.One2many('hop.purchasebill.line.barcode',"line_mst_id",copy=True)
@@ -121,8 +179,8 @@ class InheritPurchaseBill(models.Model):
                     self.box_no = False
                 # Remove the matched "box no ..." segment from the raw string
                 raw = re.sub(r'(?i)\bbox\s*(?:no\.?)?\s*[-:#]*\s*\(?\s*\d{1,6}\s*\)?', '', raw)
-            else:
-                self.box_no = False
+                # else:
+                #     self.box_no = False
                
             # Updated: Apply regex directly instead of splitting by commas first
             # pattern = r'[A-Za-z]*\(\d{2}-\d{2}\)\d+|[A-Za-z0-9]+'
@@ -168,7 +226,7 @@ class InheritPurchaseBill(models.Model):
                     self.barcode = self.barcode + ','+ line.name
 
     def write(self, vals):
-        ret = super(InheritPurchaseBill, self).write(vals)
+        ret = super(InheritPurchaseBillline, self).write(vals)
         for bar in self.barcode_line_id:
             if self.product_id != bar.product_id:
                 bar.product_id = self.product_id
@@ -203,6 +261,7 @@ class purchasebillLineBarcode(models.Model):
             if barcode:
                 raise ValidationError("Duplicate barcode is not allowed.")
         ret = super(purchasebillLineBarcode, self).create(vals)
+        ret.purchase_id = ret.line_mst_id.mst_id.id 
         return ret
     
     def write(self, vals):
@@ -216,6 +275,7 @@ class purchasebillLineBarcode(models.Model):
 
     def update_status(self):
         for bar in self.sudo().search([('is_manual','=',False)]):
+            bar.purchase_id = bar.line_mst_id.mst_id.id 
             sale_barcode = self.env['hop.salebill.line'].sudo().search([('barcode_ids', 'in', bar.ids)])
             if sale_barcode:
                 bar.stage = 'sale'
