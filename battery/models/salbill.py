@@ -122,23 +122,6 @@ class HopInheritSalebill(models.Model):
             # pattern = r'[A-Za-z0-9]*\(\d{1,2}[-/]\d{1,2}\)\d+'
             raw = self.barcode
 
-            # --- 1. Extract box number ---
-            # m = re.search(r'(?i)box\s*(?:no\.?)?\s*[-#:]*\s*(\d+)', raw)
-            # box_no = False
-            # if m:
-            #     try:
-            #         box_no = int(m.group(1))
-            #     except Exception:
-            #         box_no = False
-            # else:
-            #     box_no = False
-            # # --- 2. Clean the string ---
-            # # remove "BOX NO-73"
-            # cleaned = re.sub(r'(?i)box\s*(?:no\.?)?\s*[-#:]*\s*\d+', '', raw)
-            # # remove product prefix like
-            # cleaned = re.sub(r'^[A-Za-z\s]+-\d+/\d+', '', cleaned).strip()
-            # # update the field
-            # self.barcode = cleaned
             # pattern = r'[A-Za-z0-9]*\(\d{1,2}[-/]\d{1,2}\)\d+|[A-Z0-9]{16,}'
             pattern = r'[A-Za-z0-9]*\(\d{1,2}[-/]\d{1,2}\)\d+|[A-Z0-9]{12,16}(?=[A-Z]{3}|$)'
             barcode_list = re.findall(pattern, self.barcode)
@@ -172,7 +155,7 @@ class HopInheritSalebill(models.Model):
                             'rate' : sale_rate,
                             'unit_id': product_id.unit_id.id,
                             'barcode_ids':[(6, 0, barcodes.ids)],
-                            # 'box_no':barcodes[0].box_no if barcodes[0].box_no else False
+                            'box_no':barcodes[0].box_no if barcodes[0].box_no else False
 
                         }))
                     self.line_id = order_list
@@ -263,16 +246,16 @@ class InheritSaleBillLine(models.Model):
     @api.onchange('barcode_ids')
     def _onchange_barcode_ids(self):
         self.pcs = len(self.barcode_ids)
-        # if self.barcode_ids:
-        #      self.box_no = self.barcode_ids[0].box_no if self.barcode_ids[0].box_no else False
-        # barcode_list = []
-        # for bar in self.barcode_ids:
-        #     barcode_list.append(bar.name)
-        # if barcode_list:
-        #     error_str = self.env['hop.purchasebill.line.barcode'].barcode_check(barcode_list)
-        #     if error_str != '':
-        #         error_str =  error_str + "kavin"
-        #         raise ValidationError(error_str)
+        if self.barcode_ids:
+             self.box_no = self.barcode_ids[0].box_no if self.barcode_ids[0].box_no else False
+        barcode_list = []
+        for bar in self.barcode_ids:
+            barcode_list.append(bar.name)
+        if barcode_list:
+            error_str = self.env['hop.purchasebill.line.barcode'].barcode_check(barcode_list)
+            if error_str != '':
+                error_str =  error_str + " "
+                raise ValidationError(error_str)
     
     def tuple_return(self,cut_list):
         typle_list=''

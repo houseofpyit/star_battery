@@ -105,23 +105,25 @@ class InheritPurchaseBill(models.Model):
             self.barcode_line_id = False
             raw = self.barcode
 
-            # --- 1. Extract box number ---
-            # m = re.search(r'(?i)box\s*(?:no\.?)?\s*[-#:]*\s*(\d+)', raw)
-            # if m:
-            #     try:
-            #         self.box_no = int(m.group(1))
-            #     except Exception:
-            #         self.box_no = False
-            # else:
-            #     self.box_no = False
-            # # --- 2. Clean the string ---
-            # # remove "BOX NO-73"
-            # cleaned = re.sub(r'(?i)box\s*(?:no\.?)?\s*[-#:]*\s*\d+', '', raw)
-            # # remove product prefix like
-            # cleaned = re.sub(r'^[A-Za-z\s]+-\d+/\d+', '', cleaned).strip()
-            # # update the field
-            # self.barcode = cleaned
-                
+            if not self.barcode:
+                return
+
+            self.barcode_line_id = False
+            raw = self.barcode
+
+            # --- 1) Extract box number robustly ---
+            # Matches: BOX NO-(145), Box No: 145, box no 145, BOX-145, etc.
+            m = re.search(r'(?i)\bbox\s*(?:no\.?)?\s*[-:#]*\s*\(?\s*(\d{1,6})\s*\)?', raw)
+            if m:
+                try:
+                    self.box_no = int(m.group(1))
+                except Exception:
+                    self.box_no = False
+                # Remove the matched "box no ..." segment from the raw string
+                raw = re.sub(r'(?i)\bbox\s*(?:no\.?)?\s*[-:#]*\s*\(?\s*\d{1,6}\s*\)?', '', raw)
+            else:
+                self.box_no = False
+               
             # Updated: Apply regex directly instead of splitting by commas first
             # pattern = r'[A-Za-z]*\(\d{2}-\d{2}\)\d+|[A-Za-z0-9]+'
             # pattern = r'[A-Za-z0-9]*\(\d{2}-\d{2}\)\d+|[A-Za-z0-9]+'
@@ -149,7 +151,7 @@ class InheritPurchaseBill(models.Model):
                     'purchase_name': self.mst_id.name,
                     'line_mst_id': self.id,
                     'date':self.mst_id.date,
-                    # 'box_no':self.box_no
+                    'box_no':self.box_no
                 }))
 
             if duplicate_barcodes:
