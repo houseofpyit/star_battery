@@ -74,6 +74,7 @@ class InheritPurchaseBill(models.Model):
             line._onchange_barcode()
             line._onchange_product_id()  
             line._onchange_hsn_id()
+            line._onchange_calc_amt()
 
             
     @api.onchange('date')
