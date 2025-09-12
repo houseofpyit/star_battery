@@ -34,32 +34,28 @@ class InheritPurchaseBill(models.Model):
         if not self.barcode:
             return
         hdr_rx  = re.compile(
-            r'(?i)(?P<prod>[A-Za-z0-9/\- ]{3,120}?)\s+BOX\s*(?:NO\.?)?\s*[-:#]*\s*\(\s*(?P<box>\d{1,6})\s*\)',
-            re.DOTALL
+            r'(?isx)'                                      # i:ignorecase, s:dotall, x:verbose
+            r'(?P<prod>[A-Za-z0-9/\- ]{3,120}?)\s+'
+            r'BOX\s*(?:NO\.?)?\s*[-:#]*\s*'
+            r'\(\s*(?P<box>\d{1,6})\s*\)'
+            r'(?P<codes>.*?)'                              # eat codes lazily…
+            r'(?=(?:[A-Z][A-Z0-9/\- ]{2,}\s+BOX\s*(?:NO\.?)?\s*[-:#]*\s*\(\s*\d{1,6}\s*\)|\Z))'
+            #            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ next header …………………….. or end
         )
-        code_rx = re.compile(r'[A-Za-z0-9]*\(\d{1,2}[-/]\d{1,2}\)\d+|[A-Z0-9]{12,16}(?=[A-Z]{3}|$)')
+
+        # Codes like: SBS(09-25)6329 — robust even if stuck to next header
+        code_rx = re.compile(r'[A-Z]{2,}\(\d{1,2}[-/]\d{1,2}\)\d{2,}', re.I)
 
         out = []
-        pos = 0
-        while True:
-            m = hdr_rx.search(self.barcode, pos)
-            if not m:
-                break
-
+        for m in hdr_rx.finditer(self.barcode or ''):
             prod = (m.group('prod') or '').strip(' \t-\n\r')
             box  = int(m.group('box'))
-            start_codes = m.end()
-
-            # find next header to know where this group's barcodes stop
-            n = hdr_rx.search(self.barcode, start_codes)
-            end_codes = n.start() if n else len(self.barcode)
-
-            codes = [c.strip() for c in code_rx.findall(self.barcode[start_codes:end_codes]) if c.strip()]
+            codes_blob = m.group('codes') or ''
+            codes = [c.strip() for c in code_rx.findall(codes_blob)]
             if codes:
                 out.append({'product': prod, 'box': box, 'barcodes': codes})
 
             # continue after this header; do NOT jump past the codes so we can find the next header later
-            pos = start_codes
         line_list = []
         for line in out:
             barcode_line_list =  []
@@ -75,7 +71,7 @@ class InheritPurchaseBill(models.Model):
             line._onchange_product_id()  
             line._onchange_hsn_id()
             line._onchange_calc_amt()
-
+        self.barcode = False
             
     @api.onchange('date')
     def _onchange_date(self):
