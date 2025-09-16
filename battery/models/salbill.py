@@ -115,56 +115,107 @@ class HopInheritSalebill(models.Model):
     @api.onchange('barcode')
     def _onchange_barcode(self):
         if self.barcode:
-            hdr_rx  = re.compile(
-                r'(?isx)'                                      # i:ignorecase, s:dotall, x:verbose
-                r'(?P<prod>[A-Za-z0-9/\- ]{3,120}?)\s+'
-                r'BOX\s*(?:NO\.?)?\s*[-:#]*\s*'
-                r'\(\s*(?P<box>\d{1,6})\s*\)'
-                r'(?P<codes>.*?)'                              # eat codes lazily…
-                r'(?=(?:[A-Z][A-Z0-9/\- ]{2,}\s+BOX\s*(?:NO\.?)?\s*[-:#]*\s*\(\s*\d{1,6}\s*\)|\Z))'
-                #            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ next header …………………….. or end
-            )
+            if 'BOX' in self.barcode :
+                hdr_rx  = re.compile(
+                    r'(?isx)'                                      # i:ignorecase, s:dotall, x:verbose
+                    r'(?P<prod>[A-Za-z0-9/\- ]{3,120}?)\s+'
+                    r'BOX\s*(?:NO\.?)?\s*[-:#]*\s*'
+                    r'\(\s*(?P<box>\d{1,6})\s*\)'
+                    r'(?P<codes>.*?)'                              # eat codes lazily…
+                    r'(?=(?:[A-Z][A-Z0-9/\- ]{2,}\s+BOX\s*(?:NO\.?)?\s*[-:#]*\s*\(\s*\d{1,6}\s*\)|\Z))'
+                    #            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ next header …………………….. or end
+                )
 
-            # Codes like: SBS(09-25)6329 — robust even if stuck to next header
-            code_rx = re.compile(r'[A-Z]{2,}\(\d{1,2}[-/]\d{1,2}\)\d{2,}', re.I)
+                # Codes like: SBS(09-25)6329 — robust even if stuck to next header
+                code_rx = re.compile(r'[A-Z]{2,}\(\d{1,2}[-/]\d{1,2}\)\d{2,}', re.I)
 
-            barcode_list = []
-            for m in hdr_rx.finditer(self.barcode or ''):
-                codes_blob = m.group('codes') or ''
-                codes = [c.strip() for c in code_rx.findall(codes_blob)]
-                if codes:
-                    barcode_list.extend(codes)
-            error_str = self.env['hop.purchasebill.line.barcode'].barcode_check(barcode_list)
-            order_list = []
-            if error_str != '':
-                raise ValidationError(error_str)
+                barcode_list = []
+                for m in hdr_rx.finditer(self.barcode or ''):
+                    codes_blob = m.group('codes') or ''
+                    codes = [c.strip() for c in code_rx.findall(codes_blob)]
+                    if codes:
+                        barcode_list.extend(codes)
+                error_str = self.env['hop.purchasebill.line.barcode'].barcode_check(barcode_list)
+                order_list = []
+                if error_str != '':
+                    raise ValidationError(error_str)
+                else:
+                    barcodes = self.env['hop.purchasebill.line.barcode'].sudo().search([('name', 'in', barcode_list)])
+                    for box in set(barcodes.mapped('box_no')):
+                        barcodes_record =   barcodes.filtered(lambda l: l.box_no == box)
+                        product_id = barcodes_record[0].product_id
+                        price_rec = self.env['party.price.line'].search([('mst_id','=',self.party_id.id),('product_id','=',product_id.id)],limit=1)
+                        sale_rate = 0
+                        if price_rec:
+                            sale_rate = price_rec.price
+                            order_list.append((0, 0, {
+                                    'product_id': product_id.id,
+                                    'hsn_id': product_id.hsn_id.id,
+                                    'pcs': len(barcodes_record.ids),
+                                    'cut':product_id.cut,
+                                    'rate' : sale_rate,
+                                    'unit_id': product_id.unit_id.id,
+                                    'barcode_ids':[(6, 0, barcodes_record.ids)],
+                                    'box_no':barcodes_record[0].box_no if barcodes_record[0].box_no else False
+
+                                }))
+                self.line_id = order_list
+                self.barcode = ''
+                for line in self.line_id:
+                    line._onchange_hsn_id()
+                    line.pcs = len(line.barcode_ids)
+                    line._onchange_calc_amt()
+                self._onchange_date()
             else:
-                barcodes = self.env['hop.purchasebill.line.barcode'].sudo().search([('name', 'in', barcode_list)])
-                for box in set(barcodes.mapped('box_no')):
-                    barcodes_record =   barcodes.filtered(lambda l: l.box_no == box)
-                    product_id = barcodes_record[0].product_id
-                    price_rec = self.env['party.price.line'].search([('mst_id','=',self.party_id.id),('product_id','=',product_id.id)],limit=1)
-                    sale_rate = 0
-                    if price_rec:
-                        sale_rate = price_rec.price
-                        order_list.append((0, 0, {
-                                'product_id': product_id.id,
-                                'hsn_id': product_id.hsn_id.id,
-                                'pcs': len(barcodes_record.ids),
-                                'cut':product_id.cut,
-                                'rate' : sale_rate,
-                                'unit_id': product_id.unit_id.id,
-                                'barcode_ids':[(6, 0, barcodes_record.ids)],
-                                'box_no':barcodes_record[0].box_no if barcodes_record[0].box_no else False
+                    # Updated: Apply regex directly instead of splitting by commas first
+                    # pattern = r'[A-Za-z]*\(\d{2}-\d{2}\)\d+|[A-Za-z0-9]+'
+                    # pattern = r'[A-Za-z0-9]*\(\d{2}-\d{2}\)\d+|[A-Za-z0-9]+'
+                    # pattern = r'[A-Za-z0-9]*\(\d{1,2}[-/]\d{1,2}\)\d+'
+                    raw = self.barcode
 
-                            }))
-            self.line_id = order_list
-            self.barcode = ''
-            for line in self.line_id:
-                line._onchange_hsn_id()
-                line.pcs = len(line.barcode_ids)
-                line._onchange_calc_amt()
-            self._onchange_date()
+                    # pattern = r'[A-Za-z0-9]*\(\d{1,2}[-/]\d{1,2}\)\d+|[A-Z0-9]{16,}'
+                    pattern = r'[A-Za-z0-9]*\(\d{1,2}[-/]\d{1,2}\)\d+|[A-Z0-9]{12,16}(?=[A-Z]{3}|$)'
+                    barcode_list = re.findall(pattern, self.barcode)
+
+                    # Remove empty values and strip spaces
+                    barcode_list = [b.strip() for b in barcode_list if b.strip()] 
+
+                    error_str = self.env['hop.purchasebill.line.barcode'].barcode_check(barcode_list)
+                    order_list = []
+                    if error_str != '':
+                        raise ValidationError(error_str)
+                    else:
+                        barcodes = self.env['hop.purchasebill.line.barcode'].sudo().search([('name', 'in', barcode_list)])
+
+                        product_id = barcodes[0].product_id
+                        price_rec = self.env['party.price.line'].search([('mst_id','=',self.party_id.id),('product_id','=',product_id.id)],limit=1)
+                        sale_rate = 0
+                        if price_rec:
+                            sale_rate = price_rec.price
+                        line_record = self.line_id.filtered(lambda l: l.product_id.id == product_id.id)
+                        if line_record :
+                            barcode_list_all = list(set(line_record.barcode_ids.ids + barcodes.ids))
+                            line_record.barcode_ids = [(6, 0, barcode_list_all)]
+                            line_record.pcs = len(line_record.barcode_ids)
+                        else:
+                            order_list.append((0, 0, {
+                                    'product_id': product_id.id,
+                                    'hsn_id': product_id.hsn_id.id,
+                                    'pcs': len(barcodes.ids),
+                                    'cut':product_id.cut,
+                                    'rate' : sale_rate,
+                                    'unit_id': product_id.unit_id.id,
+                                    'barcode_ids':[(6, 0, barcodes.ids)],
+                                    'box_no':barcodes[0].box_no if barcodes[0].box_no else False
+
+                                }))
+                            self.line_id = order_list
+                        self.barcode = ''
+                    for line in self.line_id:
+                        line._onchange_hsn_id()
+                        line.pcs = len(line.barcode_ids)
+                        line._onchange_calc_amt()
+                    self._onchange_date()
 
     # @api.onchange('barcode')
     # def _onchange_barcode(self):

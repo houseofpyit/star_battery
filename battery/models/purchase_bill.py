@@ -192,26 +192,26 @@ class InheritPurchaseBillline(models.Model):
             barcode_list = [b.strip() for b in barcode_list if b.strip()]  
 
             barcode_line_list = []
-            duplicate_barcodes = []
+            # duplicate_barcodes = []
 
             for barcode in barcode_list:
                 barcode_record = self.env['hop.purchasebill.line.barcode'].sudo().search([('name', '=', barcode)], limit=1)
-                if barcode_record:
-                    duplicate_barcodes.append({'barcode':barcode ,'purchase_name':barcode_record.purchase_name})  # Collect duplicate barcodes
+                if not  barcode_record:
+                    # duplicate_barcodes.append({'barcode':barcode ,'purchase_name':barcode_record.purchase_name})  # Collect duplicate barcodes
 
-                barcode_line_list.append((0, 0, {
-                    'name': barcode,  # Keep as string, don't assign search result
-                    'stage': 'new',
-                    'product_id': self.product_id.id,
-                    'purchase_name': self.mst_id.name,
-                    'line_mst_id': self.id,
-                    'date':self.mst_id.date,
-                    'box_no':self.box_no
-                }))
+                    barcode_line_list.append((0, 0, {
+                        'name': barcode,  # Keep as string, don't assign search result
+                        'stage': 'new',
+                        'product_id': self.product_id.id,
+                        'purchase_name': self.mst_id.name,
+                        'line_mst_id': self.id,
+                        'date':self.mst_id.date,
+                        'box_no':self.box_no
+                    }))
 
-            if duplicate_barcodes:
-                duplicates_msg = "\n".join([f"Barcode: {d['barcode']} (Purchase Bill: {d['purchase_name']})" for d in duplicate_barcodes])
-                raise ValidationError(f"The following barcodes are already assigned:\n{duplicates_msg}")
+            # if duplicate_barcodes:
+            #     duplicates_msg = "\n".join([f"Barcode: {d['barcode']} (Purchase Bill: {d['purchase_name']})" for d in duplicate_barcodes])
+            #     raise ValidationError(f"The following barcodes are already assigned:\n{duplicates_msg}")
 
             self.barcode_line_id = barcode_line_list  # Assign the new barcode lines
             self.pcs = len(self.barcode_line_id)  # Update PCS count
