@@ -44,7 +44,7 @@ class InheritPurchaseBill(models.Model):
         )
 
         # Codes like: SBS(09-25)6329 — robust even if stuck to next header
-        code_rx = re.compile(r'[A-Z]{2,}\(\d{1,2}[-/]\d{1,2}\)\d{2,}', re.I)
+        code_rx = re.compile(r'[A-Za-z0-9]*\(\d{1,2}[-/]\d{1,2}\)\d+|[A-Z0-9]{12,16}(?=[A-Z]{3}|$)', re.I)
 
         out = []
         for m in hdr_rx.finditer(self.barcode or ''):
