@@ -59,12 +59,15 @@ class InheritPurchaseBill(models.Model):
         line_list = []
         for line in out:
             barcode_line_list =  []
-            barcode_record = self.env['hop.purchasebill.line.barcode'].sudo().search([('name', 'in', line.get('barcodes'))])
-            if len(line.get('barcodes')) != len(barcode_record):
+            for barcode in line.get('barcodes'):
+                barcode_record = self.env['hop.purchasebill.line.barcode'].sudo().search([('name', '=', barcode)])
+                if not barcode_record:
+                    barcode_line_list.append(barcode)
+            if barcode_line_list:
                 product_record = self.env['hop.product.mst'].sudo().search([('name', '=', line.get('product'))], limit=1)
                 line_list.append((0, 0, {
                             'product_id': product_record.id if product_record else False,
-                            'barcode':", ".join(line.get('barcodes')),
+                            'barcode':[set(barcode_line_list)],
                             'box_no':line.get('box')
                         }))
         if line_list:
@@ -258,6 +261,7 @@ class purchasebillLineBarcode(models.Model):
     def create(self, vals):
         if vals.get('name',False):
             barcode = self.env['hop.purchasebill.line.barcode'].sudo().search([('name','=',vals.get('name'))])
+            print("***********",barcode,vals.get('name'))
             if barcode:
                 raise ValidationError("Duplicate barcode is not allowed.")
         ret = super(purchasebillLineBarcode, self).create(vals)

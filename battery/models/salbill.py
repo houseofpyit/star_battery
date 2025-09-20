@@ -136,12 +136,25 @@ class HopInheritSalebill(models.Model):
                     codes = [c.strip() for c in code_rx.findall(codes_blob)]
                     if codes:
                         barcode_list.extend(codes)
-                error_str = self.env['hop.purchasebill.line.barcode'].barcode_check(barcode_list)
+                new_barcode_list = []
+                for barcode in barcode_list:
+                    barcode_record = self.env['hop.purchasebill.line.barcode'].sudo().search([('name', '=', barcode)])
+                    flg = True
+                    if barcode_record:
+                        if barcode_record.stage == 'sale':
+                            flg = False
+                        elif barcode_record.stage == 'purchase_return':
+                            flg = False
+                        elif barcode_record.stage == 'replace':
+                            flg = False
+                    if flg :
+                        new_barcode_list.append(barcode)
+                error_str = self.env['hop.purchasebill.line.barcode'].barcode_check(new_barcode_list)
                 order_list = []
                 if error_str != '':
                     raise ValidationError(error_str)
                 else:
-                    barcodes = self.env['hop.purchasebill.line.barcode'].sudo().search([('name', 'in', barcode_list)])
+                    barcodes = self.env['hop.purchasebill.line.barcode'].sudo().search([('name', 'in', new_barcode_list)])
                     for box in set(barcodes.mapped('box_no')):
                         barcodes_record =   barcodes.filtered(lambda l: l.box_no == box)
                         product_id = barcodes_record[0].product_id
@@ -149,17 +162,18 @@ class HopInheritSalebill(models.Model):
                         sale_rate = 0
                         if price_rec:
                             sale_rate = price_rec.price
-                            order_list.append((0, 0, {
-                                    'product_id': product_id.id,
-                                    'hsn_id': product_id.hsn_id.id,
-                                    'pcs': len(barcodes_record.ids),
-                                    'cut':product_id.cut,
-                                    'rate' : sale_rate,
-                                    'unit_id': product_id.unit_id.id,
-                                    'barcode_ids':[(6, 0, barcodes_record.ids)],
-                                    'box_no':barcodes_record[0].box_no if barcodes_record[0].box_no else False
+                            if barcodes_record:
+                                order_list.append((0, 0, {
+                                        'product_id': product_id.id,
+                                        'hsn_id': product_id.hsn_id.id,
+                                        'pcs': len(barcodes_record.ids),
+                                        'cut':product_id.cut,
+                                        'rate' : sale_rate,
+                                        'unit_id': product_id.unit_id.id,
+                                        'barcode_ids':[(6, 0, barcodes_record.ids)],
+                                        'box_no':barcodes_record[0].box_no if barcodes_record[0].box_no else False
 
-                                }))
+                                    }))
                 self.line_id = order_list
                 self.barcode = ''
                 for line in self.line_id:
@@ -180,13 +194,25 @@ class HopInheritSalebill(models.Model):
 
                     # Remove empty values and strip spaces
                     barcode_list = [b.strip() for b in barcode_list if b.strip()] 
-
-                    error_str = self.env['hop.purchasebill.line.barcode'].barcode_check(barcode_list)
+                    new_barcode_list = []
+                    for barcode in barcode_list:
+                        barcode_record = self.env['hop.purchasebill.line.barcode'].sudo().search([('name', '=', barcode)])
+                        flg = True
+                        if barcode_record:
+                            if barcode_record.stage == 'sale':
+                                flg = False
+                            elif barcode_record.stage == 'purchase_return':
+                                flg = False
+                            elif barcode_record.stage == 'replace':
+                                flg = False
+                        if flg :
+                            new_barcode_list.append(barcode)
+                    error_str = self.env['hop.purchasebill.line.barcode'].barcode_check(new_barcode_list)
                     order_list = []
                     if error_str != '':
                         raise ValidationError(error_str)
                     else:
-                        barcodes = self.env['hop.purchasebill.line.barcode'].sudo().search([('name', 'in', barcode_list)])
+                        barcodes = self.env['hop.purchasebill.line.barcode'].sudo().search([('name', 'in', new_barcode_list)])
 
                         product_id = barcodes[0].product_id
                         price_rec = self.env['party.price.line'].search([('mst_id','=',self.party_id.id),('product_id','=',product_id.id)],limit=1)
@@ -199,17 +225,18 @@ class HopInheritSalebill(models.Model):
                             line_record.barcode_ids = [(6, 0, barcode_list_all)]
                             line_record.pcs = len(line_record.barcode_ids)
                         else:
-                            order_list.append((0, 0, {
-                                    'product_id': product_id.id,
-                                    'hsn_id': product_id.hsn_id.id,
-                                    'pcs': len(barcodes.ids),
-                                    'cut':product_id.cut,
-                                    'rate' : sale_rate,
-                                    'unit_id': product_id.unit_id.id,
-                                    'barcode_ids':[(6, 0, barcodes.ids)],
-                                    'box_no':barcodes[0].box_no if barcodes[0].box_no else False
+                            if barcodes:
+                                order_list.append((0, 0, {
+                                        'product_id': product_id.id,
+                                        'hsn_id': product_id.hsn_id.id,
+                                        'pcs': len(barcodes.ids),
+                                        'cut':product_id.cut,
+                                        'rate' : sale_rate,
+                                        'unit_id': product_id.unit_id.id,
+                                        'barcode_ids':[(6, 0, barcodes.ids)],
+                                        'box_no':barcodes[0].box_no if barcodes[0].box_no else False
 
-                                }))
+                                    }))
                             self.line_id = order_list
                         self.barcode = ''
                     for line in self.line_id:
