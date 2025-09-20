@@ -59,18 +59,21 @@ class InheritPurchaseBill(models.Model):
         line_list = []
         for line in out:
             barcode_line_list =  []
-            product_record = self.env['hop.product.mst'].sudo().search([('name', '=', line.get('product'))], limit=1)
-            line_list.append((0, 0, {
-                        'product_id': product_record.id if product_record else False,
-                        'barcode':", ".join(line.get('barcodes')),
-                        'box_no':line.get('box')
-                    }))
-        self.line_id =  line_list
-        for line in self.line_id:
-            line._onchange_barcode()
-            line._onchange_product_id()  
-            line._onchange_hsn_id()
-            line._onchange_calc_amt()
+            barcode_record = self.env['hop.purchasebill.line.barcode'].sudo().search([('name', 'in', line.get('barcodes'))])
+            if len(line.get('barcodes')) != len(barcode_record):
+                product_record = self.env['hop.product.mst'].sudo().search([('name', '=', line.get('product'))], limit=1)
+                line_list.append((0, 0, {
+                            'product_id': product_record.id if product_record else False,
+                            'barcode':", ".join(line.get('barcodes')),
+                            'box_no':line.get('box')
+                        }))
+        if line_list:
+            self.line_id =  line_list
+            for line in self.line_id:
+                line._onchange_barcode()
+                line._onchange_product_id()  
+                line._onchange_hsn_id()
+                line._onchange_calc_amt()
         self.barcode = False
             
     @api.onchange('date')
