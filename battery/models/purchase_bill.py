@@ -57,12 +57,15 @@ class InheritPurchaseBill(models.Model):
 
             # continue after this header; do NOT jump past the codes so we can find the next header later
         line_list = []
+        duplicate_barcodes = []
         for line in out:
             barcode_line_list =  []
             for barcode in line.get('barcodes'):
                 barcode_record = self.env['hop.purchasebill.line.barcode'].sudo().search([('name', '=', barcode)])
                 if not barcode_record:
                     barcode_line_list.append(barcode)
+                else:
+                    duplicate_barcodes.append({'barcode':barcode ,'purchase_name':barcode_record.purchase_name})  # Collect duplicate barcodes
             if barcode_line_list:
                 product_record = self.env['hop.product.mst'].sudo().search([('name', '=', line.get('product'))], limit=1)
                 line_list.append((0, 0, {
@@ -70,6 +73,9 @@ class InheritPurchaseBill(models.Model):
                             'barcode':[set(barcode_line_list)],
                             'box_no':line.get('box')
                         }))
+        if duplicate_barcodes:
+                duplicates_msg = "\n".join([f"Barcode: {d['barcode']} (Purchase Bill: {d['purchase_name']})" for d in duplicate_barcodes])
+                self.env.user.notify_warning(message=duplicates_msg, title=_('Barcode check'))
         if line_list:
             self.line_id =  line_list
             for line in self.line_id:
