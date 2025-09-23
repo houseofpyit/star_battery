@@ -193,7 +193,7 @@ class HopInheritSalebill(models.Model):
 
                     # Remove empty values and strip spaces
                     barcode_list = [b.strip() for b in barcode_list if b.strip()] 
-                    new_barcode_list = barcode_list
+                    new_barcode_list =[]
                     for barcode in barcode_list:
                         barcode_record = self.env['hop.purchasebill.line.barcode'].sudo().search([('name', '=', barcode)])
                         flg = True

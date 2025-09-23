@@ -33,34 +33,43 @@ class InheritPurchaseBill(models.Model):
     def _onchange_barcode(self):
         if not self.barcode:
             return
-        hdr_rx  = re.compile(
-            r'(?isx)'                                      # i:ignorecase, s:dotall, x:verbose
-            r'(?P<prod>[A-Za-z0-9/\- ]{3,120}?)\s+'
-            r'BOX\s*(?:NO\.?)?\s*[-:#]*\s*'
-            r'\(\s*(?P<box>\d{1,6})\s*\)'
-            r'(?P<codes>.*?)'                              # eat codes lazily…
-            r'(?=(?:[A-Z][A-Z0-9/\- ]{2,}\s+BOX\s*(?:NO\.?)?\s*[-:#]*\s*\(\s*\d{1,6}\s*\)|\Z))'
-            #            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ next header …………………….. or end
-        )
+        hdr_rx  = re.compile(r'''
+            (?isx)
+            (?:                                           # OPTIONAL header block
+                (?P<prod>[A-Za-z0-9/\- ]{3,120}?)\s+      # product name
+                BOX\s*(?:NO\.?)?\s*[-:#]*\s*              # "BOX NO" with punctuation variants
+                \(\s*(?P<box>\d{1,6})\s*\)                # (96) / (100) etc.
+            )?
+            (?P<codes>.*?)                                # codes blob (lazy)
+            (?=                                           # stop when we see the next header OR end of string
+                (?:[A-Z][A-Z0-9/\- ]{2,}\s+BOX\s*(?:NO\.?)?\s*[-:#]*\s*\(\s*\d{1,6}\s*\)|\Z)
+            )
+        ''')
 
-        # Codes like: SBS(09-25)6329 — robust even if stuck to next header
+        # 2) Codes like: SBS(09-25)6329  or tight 12–16 char alnum codes (optionally glued)
         code_rx = re.compile(r'[A-Za-z0-9]*\(\d{1,2}[-/]\d{1,2}\)\d+|[A-Z0-9]{12,16}(?=[A-Z]{3}|$)', re.I)
 
+        text = self.barcode or ''
         out = []
-        for m in hdr_rx.finditer(self.barcode or ''):
+
+        for m in hdr_rx.finditer(text):
             prod = (m.group('prod') or '').strip(' \t-\n\r')
-            box  = int(m.group('box'))
+            box_str = m.group('box')
+            box = int(box_str) if box_str else None          # None when header is missing
             codes_blob = m.group('codes') or ''
             codes = [c.strip() for c in code_rx.findall(codes_blob)]
             if codes:
-                out.append({'product': prod, 'box': box, 'barcodes': codes})
+                out.append({'product': prod or None, 'box': box, 'barcodes': codes})
 
-            # continue after this header; do NOT jump past the codes so we can find the next header later
+        print("**************", out)
+        # You can now use `out` to create lines, etc.
+
         line_list = []
         duplicate_barcodes = []
         for line in out:
             barcode_line_list =  []
             for barcode in line.get('barcodes'):
+                print("*************",line.get('barcodes'))
                 barcode_record = self.env['hop.purchasebill.line.barcode'].sudo().search([('name', '=', barcode)])
                 if not barcode_record:
                     barcode_line_list.append(barcode)
