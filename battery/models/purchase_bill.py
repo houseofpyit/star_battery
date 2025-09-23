@@ -61,7 +61,6 @@ class InheritPurchaseBill(models.Model):
             if codes:
                 out.append({'product': prod or None, 'box': box, 'barcodes': codes})
 
-        print("**************", out)
         # You can now use `out` to create lines, etc.
 
         line_list = []
@@ -69,7 +68,6 @@ class InheritPurchaseBill(models.Model):
         for line in out:
             barcode_line_list =  []
             for barcode in line.get('barcodes'):
-                print("*************",line.get('barcodes'))
                 barcode_record = self.env['hop.purchasebill.line.barcode'].sudo().search([('name', '=', barcode)])
                 if not barcode_record:
                     barcode_line_list.append(barcode)
