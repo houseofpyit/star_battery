@@ -127,7 +127,13 @@ class HopInheritSalebill(models.Model):
                 )
 
                 # Codes like: SBS(09-25)6329 — robust even if stuck to next header
-                code_rx = re.compile(r'[A-Za-z0-9]*\(\d{1,2}[-/]\d{1,2}\)\d+|[A-Z0-9]{12,16}(?=[A-Z]{3}|$)', re.I)
+                # code_rx = re.compile(r'[A-Za-z0-9]*\(\d{1,2}[-/]\d{1,2}\)\d+|[A-Z0-9]{12,16}(?=[A-Z]{3}|$)', re.I)
+                code_rx = re.compile(
+                    r'[A-Za-z0-9]*\(\d{1,2}[-/]\d{1,2}\)\d+'   # case 1
+                    r'|[A-Z0-9]{12,16}(?=[A-Z]{3}|$)'          # case 2
+                    r'|[A-Z]{3}-\d{2,4}',                      # case 3 (SBS-126)
+                    re.I
+                )
 
 
                 barcode_list = []
@@ -188,7 +194,7 @@ class HopInheritSalebill(models.Model):
                     raw = self.barcode
 
                     # pattern = r'[A-Za-z0-9]*\(\d{1,2}[-/]\d{1,2}\)\d+|[A-Z0-9]{16,}'
-                    pattern = r'[A-Za-z0-9]*\(\d{1,2}[-/]\d{1,2}\)\d+|[A-Z0-9]{12,16}(?=[A-Z]{3}|$)'
+                    pattern = r'[A-Za-z0-9]*\(\d{1,2}[-/]\d{1,2}\)\d+|[A-Z0-9]{12,16}(?=[A-Z]{3}|$)+||[A-Z]{3}-\d{2,4}'
                     barcode_list = re.findall(pattern, self.barcode)
 
                     # Remove empty values and strip spaces
@@ -208,11 +214,9 @@ class HopInheritSalebill(models.Model):
                             new_barcode_list.append(barcode)
                     error_str = self.env['hop.purchasebill.line.barcode'].barcode_check(barcode_list)
                     order_list = []
-                    print("************",error_str)
                     if error_str != '':
                         self.env.user.notify_warning(message=error_str, title=_('Barcode check'))
                     barcodes = self.env['hop.purchasebill.line.barcode'].sudo().search([('name', 'in', new_barcode_list)])
-                    print("**********",barcodes)
 
                     product_id = barcodes[0].product_id if barcodes else False 
                     if product_id:

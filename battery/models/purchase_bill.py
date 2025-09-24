@@ -47,7 +47,12 @@ class InheritPurchaseBill(models.Model):
         ''')
 
         # 2) Codes like: SBS(09-25)6329  or tight 12–16 char alnum codes (optionally glued)
-        code_rx = re.compile(r'[A-Za-z0-9]*\(\d{1,2}[-/]\d{1,2}\)\d+|[A-Z0-9]{12,16}(?=[A-Z]{3}|$)', re.I)
+        code_rx = re.compile(
+                    r'[A-Za-z0-9]*\(\d{1,2}[-/]\d{1,2}\)\d+'   # case 1
+                    r'|[A-Z0-9]{12,16}(?=[A-Z]{3}|$)'          # case 2
+                    r'|[A-Z]{3}-\d{2,4}',                      # case 3 (SBS-126)
+                    re.I
+                )
 
         text = self.barcode or ''
         out = []
@@ -203,7 +208,7 @@ class InheritPurchaseBillline(models.Model):
             # pattern = r'[A-Za-z0-9]*\(\d{2}-\d{2}\)\d+|[A-Za-z0-9]+'
             # pattern = r'[A-Za-z0-9]*\(\d{1,2}[-/]\d{1,2}\)\d+'
             # pattern = r'[A-Za-z0-9]*\(\d{1,2}[-/]\d{1,2}\)\d+|[A-Z0-9]{16,}'
-            pattern = r'[A-Za-z0-9]*\(\d{1,2}[-/]\d{1,2}\)\d+|[A-Z0-9]{12,16}(?=[A-Z]{3}|$)'
+            pattern = r'[A-Za-z0-9]*\(\d{1,2}[-/]\d{1,2}\)\d+|[A-Z0-9]{12,16}(?=[A-Z]{3}|$)+||[A-Z]{3}-\d{2,4}'
 
             barcode_list = re.findall(pattern, self.barcode)
 
