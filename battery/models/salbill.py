@@ -212,38 +212,40 @@ class HopInheritSalebill(models.Model):
                     if error_str != '':
                         self.env.user.notify_warning(message=error_str, title=_('Barcode check'))
                     barcodes = self.env['hop.purchasebill.line.barcode'].sudo().search([('name', 'in', new_barcode_list)])
+                    print("**********",barcodes)
 
-                    product_id = barcodes[0].product_id
-                    price_rec = self.env['party.price.line'].search([('mst_id','=',self.party_id.id),('product_id','=',product_id.id)],limit=1)
-                    sale_rate = 0
-                    if price_rec:
-                        sale_rate = price_rec.price
-                    line_record = self.line_id.filtered(lambda l: l.product_id.id == product_id.id)
-                    if line_record :
-                        barcode_list_all = list(set(line_record.barcode_ids.ids + barcodes.ids))
-                        line_record.barcode_ids = [(6, 0, barcode_list_all)]
-                        line_record.pcs = len(line_record.barcode_ids)
-                    else:
-                        if barcodes:
-                            order_list.append((0, 0, {
-                                    'product_id': product_id.id,
-                                    'hsn_id': product_id.hsn_id.id,
-                                    'pcs': len(barcodes.ids),
-                                    'cut':product_id.cut,
-                                    'rate' : sale_rate,
-                                    'unit_id': product_id.unit_id.id,
-                                    'barcode_ids':[(6, 0, barcodes.ids)],
-                                    'box_no':barcodes[0].box_no if barcodes[0].box_no else False
+                    product_id = barcodes[0].product_id if barcodes else False 
+                    if product_id:
+                        price_rec = self.env['party.price.line'].search([('mst_id','=',self.party_id.id),('product_id','=',product_id.id)],limit=1)
+                        sale_rate = 0
+                        if price_rec:
+                            sale_rate = price_rec.price
+                        line_record = self.line_id.filtered(lambda l: l.product_id.id == product_id.id)
+                        if line_record :
+                            barcode_list_all = list(set(line_record.barcode_ids.ids + barcodes.ids))
+                            line_record.barcode_ids = [(6, 0, barcode_list_all)]
+                            line_record.pcs = len(line_record.barcode_ids)
+                        else:
+                            if barcodes:
+                                order_list.append((0, 0, {
+                                        'product_id': product_id.id,
+                                        'hsn_id': product_id.hsn_id.id,
+                                        'pcs': len(barcodes.ids),
+                                        'cut':product_id.cut,
+                                        'rate' : sale_rate,
+                                        'unit_id': product_id.unit_id.id,
+                                        'barcode_ids':[(6, 0, barcodes.ids)],
+                                        'box_no':barcodes[0].box_no if barcodes[0].box_no else False
 
-                                }))
-                        self.line_id = order_list
+                                    }))
+                            self.line_id = order_list
+                        self.barcode = ''
+                        for line in self.line_id:
+                            line._onchange_hsn_id()
+                            line.pcs = len(line.barcode_ids)
+                            line._onchange_calc_amt()
+                        self._onchange_date()
                     self.barcode = ''
-                    for line in self.line_id:
-                        line._onchange_hsn_id()
-                        line.pcs = len(line.barcode_ids)
-                        line._onchange_calc_amt()
-                    self._onchange_date()
-
     # @api.onchange('barcode')
     # def _onchange_barcode(self):
     #     if self.barcode:
