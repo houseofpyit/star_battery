@@ -150,7 +150,7 @@ class inheritStockReport(models.Model):
                 0 as gr_rt_mill_taka,0 as gr_rt_mill_meter,
                 0 as manufacturing_qty,0 as manufacturing_line_qty,
                 'replace' as module ,-1 * COALESCE(sum(b.qty),0) as pcs , 0  as meter , 0 as weight ,
-                f.name as serial , a.party_id as party_id, b.date as date, b.product_id,0 as rate,COALESCE(sum(b.qty),0) as replace
+                f.name as serial , a.party_id as party_id, b.date as date, b.product_id,0 as rate ,0 as manufacturing_line_weight,COALESCE(sum(b.qty),0) as replace
                     """
         if fields :
             query += fields
@@ -201,7 +201,7 @@ class inheritStockReport(models.Model):
                 0 as gr_rt_mill_taka,0 as gr_rt_mill_meter,
                 0 as manufacturing_qty,0 as manufacturing_line_qty,
                 'purchase_order' as module ,  -1 *  COALESCE(sum(b.pcs),0) as pcs , -1 *   COALESCE(sum(b.meter),0)  as meter , -1 *   COALESCE(sum(b.weight),0) as weight,
-                a.name as serial , a.party_id as party_id, a.date as date , b.product_id ,b.rate as rate, 0  as replace"""
+                a.name as serial , a.party_id as party_id, a.date as date , b.product_id ,b.rate as rate,0 as manufacturing_line_weight, 0  as replace"""
         if fields :
             query += fields
         query += """  from hop_purchasebill as a 
@@ -247,7 +247,7 @@ class inheritStockReport(models.Model):
     
     def stock_report(self,from_date,to_date,product_ids,category_ids,stock_status,stock_wise,company_ids,fields=False,bal_pcs_fields = False,bal_meter_fields = False,bal_weight_fields=False,group_by=False,sub_category_ids=False):
         query = self.stock_report_query(from_date,to_date,product_ids,category_ids,company_ids,sub_category_ids=sub_category_ids)
-        allQuery = """ select x.product_id ,x.itemname  , x.category  ,x.sub_category
+        allQuery = """ select x.product_id ,x.itemname  , x.category  ,x.sub_category,
                 sum(x.op_pcs) as op_pcs  , sum(x.op_meter) as op_meter , sum(x.op_weight) as op_weight , 
                 sum(x.pur_pcs) as pur_pcs ,sum(x.pur_meter) as pur_meter , sum(x.pur_weight) as pur_weight , 
                 sum(x.sale_ret_pcs) as sale_ret_pcs ,sum(x.sale_ret_meter) as sale_ret_meter ,  sum(x.sale_ret_weight) as sale_ret_weight , 
@@ -261,7 +261,7 @@ class inheritStockReport(models.Model):
                 sum(x.grey_chln_meter) as grey_chln_meter,sum(x.grey_return_meter) as grey_return_meter ,sum(x.sale_meter) as sale_meter,sum(x.sale_return_meter)  as sale_return_meter 
                 ,sum(x.mill_sent_taka) as mill_sent_taka,sum(x.mill_rec_taka) as mill_rec_taka ,sum(x.gr_rt_mill_taka) as gr_rt_mill_taka,
                 sum(x.mill_sent_meter) as mill_sent_meter,sum(x.mill_rec_meter) as mill_rec_meter ,sum(x.gr_rt_mill_meter) as gr_rt_mill_meter,
-                sum(x.manufacturing_qty) as manufacturing_qty,sum(x.manufacturing_line_qty) as  manufacturing_line_qty,sum(x.replace) as replace ,"""
+                sum(x.manufacturing_qty) as manufacturing_qty,sum(x.manufacturing_line_qty) as  manufacturing_line_qty,sum(x.replace) as replace ,sum(x.manufacturing_line_weight) as manufacturing_line_weight,"""
         if fields:
             allQuery += fields
         bal_pcs= " sum(x.op_pcs) + sum(x.pur_pcs)+ sum(x.sale_ret_pcs) - sum(x.sale_order_pcs) - sum(x.pur_ret_pcs) - sum(x.job_issue_pcs) + sum(x.job_receive_pcs) + sum(x.inward_pcs) - sum(x.outward_pcs) + sum(x.grey_chln_taka) - sum(x.grey_return_taka) - sum(x.sale_taka) + sum(x.sale_return_taka) - sum(x.mill_sent_taka) + sum(x.mill_rec_taka) + sum(x.gr_rt_mill_taka) + sum(x.manufacturing_qty) - sum(x.manufacturing_line_qty) - sum(x.replace) "
@@ -274,7 +274,7 @@ class inheritStockReport(models.Model):
             bal_meter += bal_meter_fields
         allQuery += bal_meter + " as bal_meter, "
 
-        bal_weight = " sum(x.op_weight) + sum(x.pur_weight)+ sum(x.sale_ret_weight) - sum(x.sale_order_weight) - sum(x.pur_ret_weight) - sum(x.job_issue_weight) + sum(x.job_receive_weight) "
+        bal_weight = " sum(x.op_weight) + sum(x.pur_weight)+ sum(x.sale_ret_weight) - sum(x.sale_order_weight) - sum(x.pur_ret_weight) - sum(x.job_issue_weight) + sum(x.job_receive_weight) - sum(x.manufacturing_line_weight)  "
         if bal_weight_fields :
             bal_weight += bal_weight_fields
 
