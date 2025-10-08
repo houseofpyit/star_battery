@@ -53,8 +53,34 @@
                     </tree>
                 </field>
             </xpath> -->
+            <xpath expr="//kanban/field[@name = 'pcs']" position="after">
+                    <field name="box_no"/>  
+                    <field name="barcode"/>  
+            </xpath>
+            <xpath expr="//div[@name='div_pcs']" position="inside" >
+                <div class="row" name="div_box">
+                    <div class="col-12 text-muted">
+                        <span style="padding-left:15px;">
+                                Box No.:
+                            <t t-esc="record.box_no.value"/>
+                        </span>
+                    </div>
+                </div>
+                 <div>
+                    <div class="row" name="div_box">
+                        <div class="col-12 text-muted">
+                            <span style="padding-left:15px;">
+                                Barcode :
+                                 <t t-esc="record.barcode.value"/> 
+                            </span>
+                        </div>
+                    </div>
+                    
+                </div>
+            </xpath>
         </field>
     </record>
+
     <record id="purchasebill_tree_inherited" model="ir.ui.view">
         <field name="name">hop.purchasebill.form.inherit</field>
         <field name="model">hop.purchasebill</field>

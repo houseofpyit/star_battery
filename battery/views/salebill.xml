@@ -8,69 +8,123 @@
             <field name="model">hop.salebill</field>
             <field name="inherit_id" ref="transaction.salebill_form"/>
             <field name="arch" type="xml">
-            <xpath expr="//tree/field[@name='unit_id']"  position="attributes">
-               <attribute name="optional">hide</attribute>
-            </xpath>
-            <xpath expr="//field[@name='vehical_no']" position="after">
-                <span class="o_form_label o_td_label" name="cash_acc_id" >
-                    <b>Cash A/C</b>
-                </span>
-                <div class="o_address_format">
-                    <field name="payment_acc_id" class="o_address_city" style="width:50%;" force_save="1" attrs="{'required': [('payment_amt', '!=', 0)]}" options="{'no_create': True}"/>
-                    <field name="payment_amt" class="o_address_city" style="width:40%;" readonly="0" force_save="1"/>
-                </div>
-                <span class="o_form_label o_td_label" name="bank_acc_id">
-                    <b>Bank A/C</b>
-                </span>
-                <div class="o_address_format">
-                    <field name="bank_acc_id" class="o_address_city" style="width:50%;" force_save="1" attrs="{'required': [('bank_amt', '!=', 0)]}" options="{'no_create': True}"/>
-                    <field name="bank_amt" class="o_address_city" style="width:40%;" readonly="0" force_save="1"/>
-                </div>
-            </xpath>
-                <xpath expr="//tree/field[@name='product_id']" position="after">
-                    <field name="barcode_ids" width="20%" widget="many2many_tags"  domain="[('product_id', '=', product_id),('stage', '=', 'new')]" />
-                    <field name="box_no"/>
-                    <field name="warranty" />
-                    <field name="warranty_end_date" />
-                    <field name="total_sale" optional="hide" />
+                <xpath expr="//tree/field[@name='unit_id']"  position="attributes">
+                <attribute name="optional">hide</attribute>
                 </xpath>
-                <xpath expr="//form/group/group/field[@name='product_id']" position="after">
-                 <field name="barcode_ids" width="20%" widget="many2many_tags"  domain="[('product_id', '=', product_id),('stage', '=', 'new')]" />
-                    <field name="box_no"/>
-                    <field name="warranty" />
-                    <field name="warranty_end_date" />
-                    <field name="total_sale" optional="hide" />
-            </xpath>
-             <xpath expr="//tree/field[@name='disc_per']" position="attributes">
-               <attribute name="optional">hide</attribute>
-            </xpath>
+                <xpath expr="//field[@name='vehical_no']" position="after">
+                    <span class="o_form_label o_td_label" name="cash_acc_id" >
+                        <b>Cash A/C</b>
+                    </span>
+                    <div class="o_address_format">
+                        <field name="payment_acc_id" class="o_address_city" style="width:50%;" force_save="1" attrs="{'required': [('payment_amt', '!=', 0)]}" options="{'no_create': True}"/>
+                        <field name="payment_amt" class="o_address_city" style="width:40%;" readonly="0" force_save="1"/>
+                    </div>
+                    <span class="o_form_label o_td_label" name="bank_acc_id">
+                        <b>Bank A/C</b>
+                    </span>
+                    <div class="o_address_format">
+                        <field name="bank_acc_id" class="o_address_city" style="width:50%;" force_save="1" attrs="{'required': [('bank_amt', '!=', 0)]}" options="{'no_create': True}"/>
+                        <field name="bank_amt" class="o_address_city" style="width:40%;" readonly="0" force_save="1"/>
+                    </div>
+                </xpath>
+                    <xpath expr="//tree/field[@name='product_id']" position="after">
+                        <field name="barcode_ids" width="20%" widget="many2many_tags"  domain="[('product_id', '=', product_id),('stage', '=', 'new')]" />
+                        <field name="box_no"/>
+                        <field name="warranty" />
+                        <field name="warranty_end_date" />
+                        <field name="total_sale" optional="hide" />
+                    </xpath>
+                    <xpath expr="//form/group/group/field[@name='product_id']" position="after">
+                    <field name="barcode_ids" width="20%" widget="many2many_tags"  domain="[('product_id', '=', product_id),('stage', '=', 'new')]" />
+                        <field name="box_no"/>
+                        <field name="warranty" />
+                        <field name="warranty_end_date" />
+                        <field name="total_sale" optional="hide" />
+                </xpath>
+                <xpath expr="//tree/field[@name='disc_per']" position="attributes">
+                <attribute name="optional">hide</attribute>
+                </xpath>
 
-             <xpath expr="//tree/field[@name='gst_ids']" position="attributes">
-               <attribute name="optional">hide</attribute>
-            </xpath>
+                <xpath expr="//tree/field[@name='gst_ids']" position="attributes">
+                <attribute name="optional">hide</attribute>
+                </xpath>
 
-            <xpath expr="//tree/field[@name='hsn_id']" position="attributes">
-               <attribute name="optional">hide</attribute>
-            </xpath>
+                <xpath expr="//tree/field[@name='hsn_id']" position="attributes">
+                <attribute name="optional">hide</attribute>
+                </xpath>
 
 
-            <xpath expr="//tree/field[@name='disc_amt']" position="attributes">
-               <attribute name="optional">hide</attribute>
-            </xpath>
-            <xpath expr="//tree/field[@name='add_amt']" position="attributes">
-               <attribute name="optional">hide</attribute>
-            </xpath>
-            <xpath expr="//form/group/group/field[@name='final_amt']" position="after">
-<field name="offer_status" decoration-success="offer_status != ''"  />
-            </xpath>
-                  <xpath expr="//tree/field[@name='final_amt']" position="after">
+                <xpath expr="//tree/field[@name='disc_amt']" position="attributes">
+                <attribute name="optional">hide</attribute>
+                </xpath>
+                <xpath expr="//tree/field[@name='add_amt']" position="attributes">
+                <attribute name="optional">hide</attribute>
+                </xpath>
+                <xpath expr="//form/group/group/field[@name='final_amt']" position="after">
                     <field name="offer_status" decoration-success="offer_status != ''"  />
                 </xpath>
-            <xpath expr="//field[@name='due_days']" position="after">
-                <field name="due_date" readonly="1" force_save="1"/> 
-                <!-- <button name="update_due_date" type="object" string="update" invisible="1"/> -->
-            </xpath>
-            
+                    <xpath expr="//tree/field[@name='final_amt']" position="after">
+                        <field name="offer_status" decoration-success="offer_status != ''"  />
+                    </xpath>
+                <xpath expr="//field[@name='due_days']" position="after">
+                    <field name="due_date" readonly="1" force_save="1"/> 
+                    <!-- <button name="update_due_date" type="object" string="update" invisible="1"/> -->
+                </xpath>
+
+                <xpath expr="//kanban/field[@name = 'pcs']" position="after">
+                    <field name="box_no"/>  
+                    <field name="barcode_ids"/>  
+  
+                </xpath>
+                <xpath expr="//div[@name='div_pcs']" position="inside" >
+                    <div class="row" name="div_box">
+                        <div class="col-12 text-muted">
+                            <span style="padding-left:15px;">
+                                Box No.:
+                                <t t-esc="record.box_no.value"/>
+                            </span>
+                        </div>
+                    </div>
+                <div>
+                    <div class="row" name="div_box">
+                        <div class="col-12 text-muted">
+                            <span style="padding-left:15px;">
+                                Barcode :
+                                <field name="barcode_ids" widget="many2many_tags"/> 
+                            </span>
+                        </div>
+                    </div>
+                    
+                </div>
+                </xpath>
+
+                <xpath expr="//kanban/field[@name = 'box_no']" position="after">
+                    <field name="warranty"/>  
+                </xpath>
+                <xpath expr="//div[@name='div_box']" position="inside" >
+                    <div class="row" name="div_warranty">
+                        <div class="col-12 text-muted">
+                            <span style="padding-left:30px;">
+                                    Warranty :
+                                <t t-esc="record.warranty.value"/>
+                            </span>
+                        </div>
+                    </div>
+                </xpath>
+
+                <xpath expr="//kanban/field[@name = 'warranty']" position="after">
+                    <field name="warranty_end_date"/>  
+                </xpath>
+                <xpath expr="//div[@name='div_warranty']" position="inside" >
+                    <div class="row" name="div_warranty_end_date">
+                        <div class="col-12 text-muted">
+                            <span style="padding-left:45px;">
+                                    Warranty End Date:
+                                <t t-esc="record.warranty_end_date.value"/>
+                            </span>
+                        </div>
+                    </div>
+                </xpath>
             </field>
         </record>
 
