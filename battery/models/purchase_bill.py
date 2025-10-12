@@ -236,7 +236,7 @@ class InheritPurchaseBillline(models.Model):
             # if duplicate_barcodes:
             #     duplicates_msg = "\n".join([f"Barcode: {d['barcode']} (Purchase Bill: {d['purchase_name']})" for d in duplicate_barcodes])
             #     raise ValidationError(f"The following barcodes are already assigned:\n{duplicates_msg}")
-
+            print("*******************",barcode_line_list   )
             self.barcode_line_id = barcode_line_list  # Assign the new barcode lines
             self.pcs = len(self.barcode_line_id)  # Update PCS count
             self.barcode = ''
@@ -280,6 +280,10 @@ class purchasebillLineBarcode(models.Model):
         if vals.get('name',False):
             barcode = self.env['hop.purchasebill.line.barcode'].sudo().search([('name','=',vals.get('name'))])
             print("***********",barcode,vals.get('name'))
+            if vals.get('product_id', False):
+                if type(vals.get('product_id', False)) is list:
+                    vals.update({'product_id':vals.get('product_id', False)[0]})
+
             if barcode:
                 raise ValidationError("Duplicate barcode is not allowed.")
         ret = super(purchasebillLineBarcode, self).create(vals)
