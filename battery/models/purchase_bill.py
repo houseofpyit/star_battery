@@ -178,150 +178,82 @@ class InheritPurchaseBillline(models.Model):
     barcode = fields.Text(string="Barcode")
     box_no = fields.Integer(string="Box No")
 
-    # @api.onchange('barcode')
-    # def _onchange_barcode(self):
-    #     if self.barcode:
-    #         self.barcode_line_id = False
-    #         raw = self.barcode
-
-    #         if not self.barcode:
-    #             return
-
-    #         self.barcode_line_id = False
-    #         raw = self.barcode
-
-    #         # --- 1) Extract box number robustly ---
-    #         # Matches: BOX NO-(145), Box No: 145, box no 145, BOX-145, etc.
-    #         m = re.search(r'(?i)\bbox\s*(?:no\.?)?\s*[-:#]*\s*\(?\s*(\d{1,6})\s*\)?', raw)
-    #         if m:
-    #             try:
-    #                 self.box_no = int(m.group(1))
-    #             except Exception:
-    #                 self.box_no = False
-    #             # Remove the matched "box no ..." segment from the raw string
-    #             raw = re.sub(r'(?i)\bbox\s*(?:no\.?)?\s*[-:#]*\s*\(?\s*\d{1,6}\s*\)?', '', raw)
-    #             # else:
-    #             #     self.box_no = False
-               
-    #         # Updated: Apply regex directly instead of splitting by commas first
-    #         # pattern = r'[A-Za-z]*\(\d{2}-\d{2}\)\d+|[A-Za-z0-9]+'
-    #         # pattern = r'[A-Za-z0-9]*\(\d{2}-\d{2}\)\d+|[A-Za-z0-9]+'
-    #         # pattern = r'[A-Za-z0-9]*\(\d{1,2}[-/]\d{1,2}\)\d+'
-    #         # pattern = r'[A-Za-z0-9]*\(\d{1,2}[-/]\d{1,2}\)\d+|[A-Z0-9]{16,}'
-    #         pattern = r'[A-Za-z0-9]*\(\d{1,2}[-/]\d{1,2}\)\d+|[A-Z0-9]{12,16}(?=[A-Z]{3}|$)+||[A-Z]{3}-\d{2,4}'
-
-    #         barcode_list = re.findall(pattern, self.barcode)
-
-    #         # Remove empty values and strip spaces
-    #         barcode_list = [b.strip() for b in barcode_list if b.strip()]  
-    #         barcode_list = sorted(barcode_list, key=lambda x: int(re.findall(r'\d+', x)[0]) if re.findall(r'\d+', x) else float('inf'))
-
-    #         barcode_line_list = []
-    #         # duplicate_barcodes = []
-
-    #         for barcode in barcode_list:
-    #             barcode_record = self.env['hop.purchasebill.line.barcode'].sudo().search([('name', '=', barcode)], limit=1)
-    #             if not  barcode_record:
-    #                 # duplicate_barcodes.append({'barcode':barcode ,'purchase_name':barcode_record.purchase_name})  # Collect duplicate barcodes
-
-    #                 barcode_line_list.append((0, 0, {
-    #                     'name': barcode,  # Keep as string, don't assign search result
-    #                     'stage': 'new',
-    #                     'product_id': self.product_id.id,
-    #                     'purchase_name': self.mst_id.name,
-    #                     'line_mst_id': self.id,
-    #                     'date':self.mst_id.date,
-    #                     'box_no':self.box_no
-    #                 }))
-
-    #         # if duplicate_barcodes:
-    #         #     duplicates_msg = "\n".join([f"Barcode: {d['barcode']} (Purchase Bill: {d['purchase_name']})" for d in duplicate_barcodes])
-    #         #     raise ValidationError(f"The following barcodes are already assigned:\n{duplicates_msg}")
-    #         print("*******************",barcode_line_list   )
-    #         self.barcode_line_id = barcode_line_list  # Assign the new barcode lines
-    #         self.pcs = len(self.barcode_line_id)  # Update PCS count
-    #         self.barcode = ''
-    #         for line in self.barcode_line_id:
-    #             if self.barcode == '':
-    #                 self.barcode = line.name
-    #             else:
-    #                 self.barcode = self.barcode + ','+ line.name
-
-
     @api.onchange('barcode')
     def _onchange_barcode(self):
-        if not self.barcode:
-            return
+        if self.barcode:
+            self.barcode_line_id = False
+            raw = self.barcode
 
-        self.barcode_line_id = False
+            if not self.barcode:
+                return
 
-        # --- Normalize whitespace (tabs/newlines -> spaces) ---
-        raw = self.barcode
-        raw_norm = re.sub(r'[ \t]+', ' ', raw)
-        raw_norm = re.sub(r'\s*\n+\s*', ' ', raw_norm).strip()
+            self.barcode_line_id = False
+            raw = self.barcode
 
-        # --- Extract box number robustly and remove that segment from text ---
-        box_m = re.search(r'(?i)\bbox\s*(?:no\.?)?\s*[-:#( ]*\s*(\d{1,6})\s*\)?', raw_norm)
-        if box_m:
-            try:
-                self.box_no = int(box_m.group(1))
-            except Exception:
-                self.box_no = False
-            raw_norm = re.sub(r'(?i)\bbox\s*(?:no\.?)?\s*[-:#( ]*\s*\d{1,6}\s*\)?', '', raw_norm)
-        else:
-            self.box_no = False
+            # --- 1) Extract box number robustly ---
+            # Matches: BOX NO-(145), Box No: 145, box no 145, BOX-145, etc.
+            m = re.search(r'(?i)\bbox\s*(?:no\.?)?\s*[-:#]*\s*\(?\s*(\d{1,6})\s*\)?', raw)
+            if m:
+                try:
+                    self.box_no = int(m.group(1))
+                except Exception:
+                    self.box_no = False
+                # Remove the matched "box no ..." segment from the raw string
+                raw = re.sub(r'(?i)\bbox\s*(?:no\.?)?\s*[-:#]*\s*\(?\s*\d{1,6}\s*\)?', '', raw)
+                # else:
+                #     self.box_no = False
+               
+            # Updated: Apply regex directly instead of splitting by commas first
+            # pattern = r'[A-Za-z]*\(\d{2}-\d{2}\)\d+|[A-Za-z0-9]+'
+            # pattern = r'[A-Za-z0-9]*\(\d{2}-\d{2}\)\d+|[A-Za-z0-9]+'
+            # pattern = r'[A-Za-z0-9]*\(\d{1,2}[-/]\d{1,2}\)\d+'
+            # pattern = r'[A-Za-z0-9]*\(\d{1,2}[-/]\d{1,2}\)\d+|[A-Z0-9]{16,}'
+            pattern = r'[A-Za-z0-9]*\(\d{1,2}[-/]\d{1,2}\)\d+|[A-Z0-9]{12,16}(?=[A-Z]{3}|$)+||[A-Z]{3}-\d{2,4}'
 
-        # --- Unified pattern (FIXED: removed the accidental '||') ---
-        pattern = r'[A-Za-z0-9]*\(\d{1,2}[-/]\d{1,2}\)\d+|[A-Z0-9]{12,16}(?=[A-Z]{3}|$)+||[A-Z]{3}-\d{2,4}'
+            barcode_list = re.findall(pattern, self.barcode)
 
+            # Remove empty values and strip spaces
+            barcode_list = [b.strip() for b in barcode_list if b.strip()]  
+            barcode_list = sorted(barcode_list, key=lambda x: int(re.findall(r'\d+', x)[0]) if re.findall(r'\d+', x) else float('inf'))
 
-        found = re.findall(pattern, raw_norm)
-        # Clean + preserve first occurrence order
-        cleaned = []
-        seen = set()
-        for b in (s.strip() for s in found if s.strip()):
-            if b not in seen:
-                seen.add(b)
-                cleaned.append(b)
+            barcode_line_list = []
+            # optional de-dupe while preserving order
+            _seen = set()
+            barcode_list = [c for c in barcode_list if not (c in _seen or _seen.add(c))]
 
-        # Sort by trailing number (if any), then by text
-        def _trail_num(s):
-            m = re.search(r'(\d+)\b', s)
-            return int(m.group(1)) if m else 10**9
+            # sort by the LAST number (e.g., 6800 in SBS(11-25)6800), then lexicographically
+            def _last_num(s: str) -> int:
+                m = re.search(r'(\d+)(?!.*\d)', s)   # last digit-run in the string
+                return int(m.group(1)) if m else 10**9
 
-        barcode_list = sorted(cleaned, key=lambda s: (_trail_num(s), s))
+            barcode_list.sort(key=lambda s: (_last_num(s), s))
+            for barcode in barcode_list:
+                barcode_record = self.env['hop.purchasebill.line.barcode'].sudo().search([('name', '=', barcode)], limit=1)
+                if not  barcode_record:
+                    # duplicate_barcodes.append({'barcode':barcode ,'purchase_name':barcode_record.purchase_name})  # Collect duplicate barcodes
 
-        # --- Skip already-used barcodes with a single bulk query ---
-        existing_rs = self.env['hop.purchasebill.line.barcode'].sudo().search([('name', 'in', barcode_list)])
-        used = set(existing_rs.mapped('name'))
+                    barcode_line_list.append((0, 0, {
+                        'name': barcode,  # Keep as string, don't assign search result
+                        'stage': 'new',
+                        'product_id': self.product_id.id,
+                        'purchase_name': self.mst_id.name,
+                        'line_mst_id': self.id,
+                        'date':self.mst_id.date,
+                        'box_no':self.box_no
+                    }))
 
-        to_create = [b for b in barcode_list if b not in used]
-
-        barcode_line_list = []
-        for b in to_create:
-            barcode_line_list.append((
-                0, 0, {
-                    'name': b,
-                    'stage': 'new',
-                    'product_id': self.product_id.id,
-                    'purchase_name': self.mst_id.name,
-                    'line_mst_id': self.id,
-                    'date': self.mst_id.date,
-                    'box_no': self.box_no,
-                }
-            ))
-
-        # Assign new lines (O2M commands) and derived fields
-        self.barcode_line_id = barcode_line_list
-        self.pcs = len(barcode_line_list)
-
-        # Rebuild comma string from the lines we just created
-        self.barcode = ','.join(to_create)
-
-        # (Optional) If you want to warn for duplicates already assigned elsewhere:
-        # if used:
-        #     raise ValidationError("These barcodes are already assigned: %s" % ', '.join(sorted(used, key=_trail_num)))
-
+            # if duplicate_barcodes:
+            #     duplicates_msg = "\n".join([f"Barcode: {d['barcode']} (Purchase Bill: {d['purchase_name']})" for d in duplicate_barcodes])
+            #     raise ValidationError(f"The following barcodes are already assigned:\n{duplicates_msg}")
+            print("*******************",barcode_line_list   )
+            self.barcode_line_id = barcode_line_list  # Assign the new barcode lines
+            self.pcs = len(self.barcode_line_id)  # Update PCS count
+            self.barcode = ''
+            for line in self.barcode_line_id:
+                if self.barcode == '':
+                    self.barcode = line.name
+                else:
+                    self.barcode = self.barcode + ','+ line.name
 
     def write(self, vals):
         ret = super(InheritPurchaseBillline, self).write(vals)

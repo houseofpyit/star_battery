@@ -140,6 +140,15 @@ class HopInheritSalebill(models.Model):
                 for m in hdr_rx.finditer(self.barcode or ''):
                     codes_blob = m.group('codes') or ''
                     codes = [c.strip() for c in code_rx.findall(codes_blob)]
+                    _seen = set()
+                    codes = [c for c in codes if not (c in _seen or _seen.add(c))]
+
+                    # sort by the LAST number (e.g., 6800 in SBS(11-25)6800), then lexicographically
+                    def _last_num(s: str) -> int:
+                        m = re.search(r'(\d+)(?!.*\d)', s)   # last digit-run in the string
+                        return int(m.group(1)) if m else 10**9
+
+                    codes.sort(key=lambda s: (_last_num(s), s))
                     if codes:
                         barcode_list.extend(codes)
                 new_barcode_list = []
