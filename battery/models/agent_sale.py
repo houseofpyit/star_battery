@@ -33,6 +33,7 @@ class HopAgentSale(models.Model):
 
             # Remove empty values and strip spaces
             barcode_list = [b.strip() for b in barcode_list if b.strip()] 
+            barcode_list = sorted(barcode_list, key=lambda x: int(re.findall(r'\d+', x)[0]) if re.findall(r'\d+', x) else float('inf'))
 
             error_str = self.env['hop.purchasebill.line.barcode'].barcode_check(barcode_list)
             order_list = []

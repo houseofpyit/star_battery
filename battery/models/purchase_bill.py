@@ -214,6 +214,7 @@ class InheritPurchaseBillline(models.Model):
 
             # Remove empty values and strip spaces
             barcode_list = [b.strip() for b in barcode_list if b.strip()]  
+            barcode_list = sorted(barcode_list, key=lambda x: int(re.findall(r'\d+', x)[0]) if re.findall(r'\d+', x) else float('inf'))
 
             barcode_line_list = []
             # duplicate_barcodes = []
