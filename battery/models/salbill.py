@@ -131,7 +131,8 @@ class HopInheritSalebill(models.Model):
                 code_rx = re.compile(
                     r'[A-Za-z0-9]*\(\d{1,2}[-/]\d{1,2}\)\d+'   # case 1
                     r'|[A-Z0-9]{12,16}(?=[A-Z]{3}|$)'          # case 2
-                    r'|[A-Z]{3}-\d{2,4}',                      # case 3 (SBS-126)
+                    r'|[A-Z]{3}-\d{2,4}'                     # case 3 (SBS-126)
+                    r'|(?=.*[A-Z])(?=.*\d)[A-Z0-9]{7,12}', 
                     re.I
                 )
 
@@ -203,7 +204,7 @@ class HopInheritSalebill(models.Model):
                     raw = self.barcode
 
                     # pattern = r'[A-Za-z0-9]*\(\d{1,2}[-/]\d{1,2}\)\d+|[A-Z0-9]{16,}'
-                    pattern = r'[A-Za-z0-9]*\(\d{1,2}[-/]\d{1,2}\)\d+|[A-Z0-9]{12,16}(?=[A-Z]{3}|$)+||[A-Z]{3}-\d{2,4}'
+                    pattern = r'[A-Za-z0-9]*\(\d{1,2}[-/]\d{1,2}\)\d+|[A-Z0-9]{12,16}(?=[A-Z]{3}|$)+||[A-Z]{3}-\d{2,4}|(?=.*[A-Z])(?=.*\d)[A-Z0-9]{7,12}'
                     barcode_list = re.findall(pattern, self.barcode)
 
                     # Remove empty values and strip spaces
