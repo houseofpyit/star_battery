@@ -81,6 +81,13 @@ class ReplacementBatteryWizard(models.TransientModel):
                             if sale_record:
                                 self.party_id = sale_record.party_id.id
                             self.salebill_id = False
+
+                            if self.warranty_end_date  and self.warranty_end_date < date.today():
+                                if sale_record:
+                                    raise ValidationError(f"Warranty has expired for the customer '{sale_record.party_id.name}'.")
+                                else:
+                                    raise ValidationError("The warranty has expired.")       
+                  
                         else:
                             salebill_date = sale_record.date
                             product_warranty_months = product_id.warranty + product_id.distributor_warranty
@@ -89,6 +96,11 @@ class ReplacementBatteryWizard(models.TransientModel):
                             self.date = sale_record.date
                             self.party_id = sale_record.party_id.id
                             self.salebill_id = sale_record.id
+                            if self.warranty_end_date  and self.warranty_end_date < date.today():
+                                if sale_record:
+                                    raise ValidationError(f"Warranty has expired for the customer '{sale_record.party_id.name}'.")
+                                else:
+                                    raise ValidationError("The warranty has expired.") 
 
                     if replacement :
                         self.line_ids =  False

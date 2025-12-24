@@ -91,27 +91,28 @@ class HopInheritSalebill(models.Model):
     def party_total_purchase(self):
         for i in self.line_id.sudo():
             if i.product_id:
-                query = f""" select COALESCE(sum(x.billpcs),0) - COALESCE(sum(x.returnpcs),0) as total_sale from(
-                                select COALESCE(sum(b.pcs),0) as billpcs ,0 as returnpcs 
-                                from hop_salebill as a 
-                                inner join hop_salebill_line as b on a.id = b.mst_id 
-                                where a.party_id = {str(self.party_id.id)} and b.product_id = {str(i.product_id.id)}
-                                and a.date <=  '{str(self.env.user.fy_to_date)}'
-                                and a.date >=  '{str(self.env.user.fy_from_date)}'
-                                
-                                union all 
-                                select COALESCE(sum(b.pcs),0) as billpcs ,0 as returnpcs 
-                                from hop_salebillreturn as a 
-                                inner join hop_salebillreturn_line as b on a.id = b.mst_id 
-                                where a.party_id = {str(self.party_id.id)} and b.product_id = {str(i.product_id.id)}
-                                and a.date <=  '{str(self.env.user.fy_to_date)}'
-                                and a.date >=  '{str(self.env.user.fy_from_date)}'
-                            ) x
-                        """
-                self.env.cr.execute(query)
-                query_result = self.env.cr.dictfetchone()
-                if query_result:
-                    i.total_sale = query_result.get('total_sale',0)
+                if self.env.user.fy_to_date and self.env.user.fy_from_date:
+                    query = f""" select COALESCE(sum(x.billpcs),0) - COALESCE(sum(x.returnpcs),0) as total_sale from(
+                                    select COALESCE(sum(b.pcs),0) as billpcs ,0 as returnpcs 
+                                    from hop_salebill as a 
+                                    inner join hop_salebill_line as b on a.id = b.mst_id 
+                                    where a.party_id = {str(self.party_id.id)} and b.product_id = {str(i.product_id.id)}
+                                    and a.date <=  '{str(self.env.user.fy_to_date)}'
+                                    and a.date >=  '{str(self.env.user.fy_from_date)}'
+                                    
+                                    union all 
+                                    select COALESCE(sum(b.pcs),0) as billpcs ,0 as returnpcs 
+                                    from hop_salebillreturn as a 
+                                    inner join hop_salebillreturn_line as b on a.id = b.mst_id 
+                                    where a.party_id = {str(self.party_id.id)} and b.product_id = {str(i.product_id.id)}
+                                    and a.date <=  '{str(self.env.user.fy_to_date)}'
+                                    and a.date >=  '{str(self.env.user.fy_from_date)}'
+                                ) x
+                            """
+                    self.env.cr.execute(query)
+                    query_result = self.env.cr.dictfetchone()
+                    if query_result:
+                        i.total_sale = query_result.get('total_sale',0)
     @api.onchange('barcode')
     def _onchange_barcode(self):
         if self.barcode:
