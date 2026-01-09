@@ -5,7 +5,7 @@ from odoo.exceptions import UserError, ValidationError
 import re
 from ...transaction import common_file
 from datetime import datetime, timedelta
-import ast
+
 
 class InheritPurchaseBill(models.Model):
     _inherit = 'hop.purchasebill'
@@ -27,54 +27,6 @@ class InheritPurchaseBill(models.Model):
     def update_due_date(self):
         for res in self.search([]):
             res.due_date =  res.date + timedelta(days=res.due_days)
-
-    def extract_barcodes(self,text):
-        if not text:
-            return []
-
-        result = []
-        # -----------------------------
-        # PASS 3: SINGLE LETTER + 7 DIGITS
-        # Example: C3112528
-        # -----------------------------
-        rx_c = re.compile(r'[A-Z]\d{7}', re.I)
-        matches = rx_c.findall(text)
-        if matches:
-            return matches
-        # -----------------------------
-        # PASS 1: BARCODE WITH SPACE INSIDE
-        # Example: A26BP03 ECO4370A26BP03 ECO4371
-        # -----------------------------
-        rx_space = re.compile(r'[A-Z0-9]+\s+[A-Z]{2,5}\d{4}', re.I)
-        matches = rx_space.findall(text)
-        if matches:
-            return matches
-
-        # -----------------------------
-        # PASS 2: FIXED 11-CHAR BARCODE
-        # Example: A26BP084424
-        # -----------------------------
-        rx_fixed = re.compile(r'[A-Z][A-Z0-9]{10}', re.I)
-        matches = rx_fixed.findall(text)
-        if matches:
-            return matches
-
-       
-
-        # -----------------------------
-        # PASS 4: OTHER SAFE FORMATS
-        # -----------------------------
-        rx_other = re.compile(
-            r'[A-Za-z0-9]*\(\d{1,2}[-/]\d{1,2}\)\d+'   # case 1
-            r'|[A-Z0-9]{12,16}(?=[A-Z]{3}|$)'          # case 2
-            r'|[A-Z]{3}-\d{2,4}'
-            r'|(?=.*[A-Z])(?=.*\d)[A-Z0-9]{7,12}',                       # SBS-126
-            re.I
-        )
-        matches = rx_other.findall(text)
-        if matches:
-            return matches
-        return result
 
 
     @api.onchange('barcode')
@@ -111,8 +63,7 @@ class InheritPurchaseBill(models.Model):
             box_str = m.group('box')
             box = int(box_str) if box_str else None          # None when header is missing
             codes_blob = m.group('codes') or ''
-            # codes = [c.strip() for c in code_rx.findall(codes_blob)]
-            codes = self.extract_barcodes(codes_blob)
+            codes = [c.strip() for c in code_rx.findall(codes_blob)]
             if codes:
                 out.append({'product': prod or None, 'box': box, 'barcodes': codes})
 
@@ -132,8 +83,7 @@ class InheritPurchaseBill(models.Model):
                 product_record = self.env['hop.product.mst'].sudo().search([('name', '=', line.get('product'))], limit=1)
                 line_list.append((0, 0, {
                             'product_id': product_record.id if product_record else False,
-                            # 'barcode':[set(barcode_line_list)],
-                            'barcode':barcode_line_list,
+                            'barcode':[set(barcode_line_list)],
                             'box_no':line.get('box')
                         }))
         if duplicate_barcodes:
@@ -228,21 +178,7 @@ class InheritPurchaseBillline(models.Model):
     barcode_line_id = fields.One2many('hop.purchasebill.line.barcode',"line_mst_id",copy=True)
     barcode = fields.Text(string="Barcode")
     box_no = fields.Integer(string="Box No")
-    def safe_barcode_list(self, value):
-        if not value:
-            return []
 
-        value = value.strip()
-
-        # Looks like a Python list
-        if value.startswith('[') and value.endswith(']'):
-            try:
-                return ast.literal_eval(value)
-            except Exception:
-                pass
-
-        # Otherwise treat as raw barcode input
-        return self.mst_id.extract_barcodes(value)
     @api.onchange('barcode')
     def _onchange_barcode(self):
         if self.barcode:
@@ -292,11 +228,6 @@ class InheritPurchaseBillline(models.Model):
                 return int(m.group(1)) if m else 10**9
 
             barcode_list.sort(key=lambda s: (_last_num(s), s))
-            # add new
-            print("************",self.barcode)
-            barcode_list = self.safe_barcode_list(self.barcode)
-            barcode_line_list = []
-            # add new and 
             for barcode in barcode_list:
                 barcode_record = self.env['hop.purchasebill.line.barcode'].sudo().search([('name', '=', barcode)], limit=1)
                 if not  barcode_record:
@@ -315,7 +246,7 @@ class InheritPurchaseBillline(models.Model):
             # if duplicate_barcodes:
             #     duplicates_msg = "\n".join([f"Barcode: {d['barcode']} (Purchase Bill: {d['purchase_name']})" for d in duplicate_barcodes])
             #     raise ValidationError(f"The following barcodes are already assigned:\n{duplicates_msg}")
-            
+            print("*******************",barcode_line_list   )
             self.barcode_line_id = barcode_line_list  # Assign the new barcode lines
             self.pcs = len(self.barcode_line_id)  # Update PCS count
             self.barcode = ''

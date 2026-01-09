@@ -22,6 +22,54 @@ class HopAgentSale(models.Model):
     receipt_count = fields.Integer(string="Receipt Count", compute="_compute_receipt_count")
     replace_count = fields.Integer(string="Receipt Count", compute="_compute_replace_count")
 
+    def extract_barcodes(self,text):
+        if not text:
+            return []
+
+        result = []
+        # -----------------------------
+        # PASS 3: SINGLE LETTER + 7 DIGITS
+        # Example: C3112528
+        # -----------------------------
+        rx_c = re.compile(r'[A-Z]\d{7}', re.I)
+        matches = rx_c.findall(text)
+        if matches:
+            return matches
+        # -----------------------------
+        # PASS 1: BARCODE WITH SPACE INSIDE
+        # Example: A26BP03 ECO4370A26BP03 ECO4371
+        # -----------------------------
+        rx_space = re.compile(r'[A-Z0-9]+\s+[A-Z]{2,5}\d{4}', re.I)
+        matches = rx_space.findall(text)
+        if matches:
+            return matches
+
+        # -----------------------------
+        # PASS 2: FIXED 11-CHAR BARCODE
+        # Example: A26BP084424
+        # -----------------------------
+        rx_fixed = re.compile(r'[A-Z][A-Z0-9]{10}', re.I)
+        matches = rx_fixed.findall(text)
+        if matches:
+            return matches
+
+       
+
+        # -----------------------------
+        # PASS 4: OTHER SAFE FORMATS
+        # -----------------------------
+        rx_other = re.compile(
+            r'[A-Za-z0-9]*\(\d{1,2}[-/]\d{1,2}\)\d+'   # case 1
+            r'|[A-Z0-9]{12,16}(?=[A-Z]{3}|$)'          # case 2
+            r'|[A-Z]{3}-\d{2,4}'
+            r'|(?=.*[A-Z])(?=.*\d)[A-Z0-9]{7,12}',                       # SBS-126
+            re.I
+        )
+        matches = rx_other.findall(text)
+        if matches:
+            return matches
+        return result
+
     @api.onchange('barcode')
     def _onchange_barcode(self):
         if self.barcode:
@@ -29,7 +77,8 @@ class HopAgentSale(models.Model):
             # pattern = r'[A-Za-z0-9]*\(\d{1,2}[-/]\d{1,2}\)\d+'
             # pattern = r'[A-Za-z0-9]*\(\d{1,2}[-/]\d{1,2}\)\d+|[A-Z0-9]{16,}'
             pattern = rpattern = r'[A-Za-z0-9]*\(\d{1,2}[-/]\d{1,2}\)\d+|[A-Z0-9]{12,16}(?=[A-Z]{3}|$)+||[A-Z]{3}-\d{2,4}|(?=.*[A-Z])(?=.*\d)[A-Z0-9]{7,12}'
-            barcode_list = re.findall(pattern, self.barcode)
+            # old barcode_list = re.findall(pattern, self.barcode)
+            barcode_list = self.extract_barcodes(self.barcode)
 
             # Remove empty values and strip spaces
             barcode_list = [b.strip() for b in barcode_list if b.strip()] 
