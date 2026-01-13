@@ -78,6 +78,16 @@
                     
                 </div>
             </xpath>
+            <xpath expr="//field[@name='net_amt']" position="after">
+                <div class="oe_subtotal_footer_separator oe_inline o_td_label">
+                    <label for="transport_amt"/>
+                </div>
+                <field name="transport_amt" nolabel="1" class="oe_subtotal_footer_separator" force_save="1"/>
+                <div class="oe_subtotal_footer_separator oe_inline o_td_label">
+                    <label for="with_transport_amt" attrs="{'invisible': [('transport_amt', '=', 0)]}"/>
+                </div>
+                <field name="with_transport_amt" nolabel="1" class="oe_subtotal_footer_separator" readonly="1" force_save="1" attrs="{'invisible': [('transport_amt', '=', 0)]}"/>
+            </xpath>
         </field>
     </record>
 

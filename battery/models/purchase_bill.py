@@ -13,6 +13,13 @@ class InheritPurchaseBill(models.Model):
     mobile_no = fields.Char(string="Mobile No",related='party_id.mobile')
     city_id = fields.Many2one('res.city', string="City",related='party_id.city_id')
     due_date = fields.Date(string='Due Date',default=fields.Date.context_today,tracking=True)
+    transport_amt = fields.Float(string="Transport Amount")
+    with_transport_amt = fields.Float(string="With Transport Amount")
+
+    @api.onchange('transport_amt','net_amt')
+    def _onchange_transport_amt(self):
+       if self.transport_amt:
+            self.with_transport_amt = self.net_amt + self.transport_amt
 
     @api.depends('barcode_active')
     def _compute_barcode_active(self):
