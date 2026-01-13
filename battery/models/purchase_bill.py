@@ -37,7 +37,7 @@ class InheritPurchaseBill(models.Model):
         # PASS 3: SINGLE LETTER + 7 DIGITS
         # Example: C3112528
         # -----------------------------
-        rx_c = re.compile(r'[A-Z]\d{7}', re.I)
+        rx_c = re.compile(r'[A-Z]\d{10}', re.I)
         matches = rx_c.findall(text)
         if matches:
             return matches
